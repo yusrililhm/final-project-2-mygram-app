@@ -52,7 +52,10 @@ func handleRequiredTables() {
 						updated_at TIMESTAMPTZ DEFAULT now(),
 						CONSTRAINT
 							unique_email
-								UNIQUE(email)
+								UNIQUE(email),
+						CONSTRAINT
+							unique_username
+								UNIQUE(username)
 					)
 		`
 		createTablePhotosQuery = `
