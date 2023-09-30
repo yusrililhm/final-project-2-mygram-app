@@ -18,7 +18,7 @@ func handleDatabaseConnection() {
 
 	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		appConfig.DbHost,
-		appConfig.Port,
+		appConfig.DbPort,
 		appConfig.DbUser,
 		appConfig.DbPassword,
 		appConfig.DbName,
