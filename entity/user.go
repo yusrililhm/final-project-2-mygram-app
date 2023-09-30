@@ -1,7 +1,7 @@
 package entity
 
 import (
-	"myGram/pkg/err"
+	"myGram/pkg/errs"
 	"strings"
 	"time"
 
@@ -19,9 +19,9 @@ type User struct {
 	UpdatedAt time.Time
 }
 
-var invalidToken = err.NewUnauthenticatedError("invalid token")
+var invalidToken = errs.NewUnauthenticatedError("invalid token")
 
-func (u *User) parseToken(tokenString string) (*jwt.Token, err.Error) {
+func (u *User) parseToken(tokenString string) (*jwt.Token, errs.Error) {
 	token, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
 
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -38,7 +38,7 @@ func (u *User) parseToken(tokenString string) (*jwt.Token, err.Error) {
 	return token, nil
 }
 
-func (u *User) bindTokenToUserEntity(claims jwt.MapClaims) err.Error {
+func (u *User) bindTokenToUserEntity(claims jwt.MapClaims) errs.Error {
 
 	if id, ok := claims["id"].(float64); !ok {
 		return invalidToken
@@ -61,7 +61,7 @@ func (u *User) bindTokenToUserEntity(claims jwt.MapClaims) err.Error {
 	return nil
 }
 
-func (u *User) ValidateToken(bearerToken string) err.Error {
+func (u *User) ValidateToken(bearerToken string) errs.Error {
 
 	isBearer := strings.HasPrefix("Bearer", bearerToken)
 
