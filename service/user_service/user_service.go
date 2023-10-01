@@ -11,6 +11,7 @@ import (
 
 type UserService interface {
 	Add(userPayload *dto.NewUserRequest) (*dto.GetUserResponse, errs.Error)
+	Get(userPayload *dto.UserRequest) (*dto.GetUserResponse, errs.Error)
 }
 
 type userServiceImpl struct {
@@ -55,6 +56,41 @@ func (userService *userServiceImpl) Add(userPayload *dto.NewUserRequest) (*dto.G
 			Username: user.Username,
 			Email:    user.Email,
 			Age:      user.Age,
+		},
+	}, nil
+}
+
+// Get implements UserService.
+func (us *userServiceImpl) Get(userPayload *dto.UserRequest) (*dto.GetUserResponse, errs.Error) {
+
+	err := helper.ValidateStruct(userPayload)
+
+	if err != nil {
+		return nil, err
+	}
+
+	user, err := us.userRepo.Fetch(userPayload.Email)
+
+	if err != nil {
+		if err.Status() == http.StatusNotFound {
+			return nil, errs.NewBadRequestError("invalid email/password")
+		}
+		return nil, err
+	}
+
+	isValidPassword := user.ComparePassword(userPayload.Password)
+
+	if isValidPassword == false {
+		return nil, errs.NewBadRequestError("invalid email/password")
+	}
+
+	token := user.GenerateToken()
+
+	return &dto.GetUserResponse{
+		StatusCode: http.StatusOK,
+		Message:    "successfully loged in",
+		Data: dto.TokenResponse{
+			Token: token,
 		},
 	}, nil
 }
