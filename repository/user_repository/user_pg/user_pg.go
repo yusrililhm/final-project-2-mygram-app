@@ -28,26 +28,26 @@ func NewUserRepository(db *sql.DB) user_repository.UserRepository {
 }
 
 // Create implements user_repository.UserRepository.
-func (userRepo *userRepositoryImpl) Create(userPayload *entity.User) (*int, errs.Error) {
+func (userRepo *userRepositoryImpl) Create(userPayload *entity.User) (int, errs.Error) {
 	var id int
 	tx, err := userRepo.db.Begin()
 
 	if err != nil {
 		tx.Rollback()
-		return nil, errs.NewInternalServerError("something went wrong")
+		return 0, errs.NewInternalServerError("something went wrong")
 	}
 
 	err = tx.QueryRow(createUserQuery, userPayload.Username, userPayload.Email, userPayload.Age, userPayload.Password).Scan(&id)
 
 	if err != nil {
 		tx.Rollback()
-		return nil, errs.NewInternalServerError("something went wron")
+		return 0, errs.NewInternalServerError("something went wron")
 	}
 
 	if err := tx.Commit(); err != nil {
 		tx.Rollback()
-		return nil, errs.NewInternalServerError("something went wron")
+		return 0, errs.NewInternalServerError("something went wron")
 	}
 
-	return &id, nil
+	return id, nil
 }
