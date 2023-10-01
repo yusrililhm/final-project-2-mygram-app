@@ -1,15 +1,15 @@
 package dto
 
 type NewUserRequest struct {
-	Username string `json:"username" validate:"required, unique" example:"anyujin"`
-	Email    string `json:"email" validate:"required, unique" example:"yujin.an@email.com"`
-	Age      uint   `json:"age" validate:"required, gte=8" example:"20"`
-	Password string `json:"password" validate:"required, min=6" example:"secret"`
+	Username string `json:"username" valid:"required~Username can't be empty" example:"monday"`
+	Email    string `json:"email" valid:"required~Email can't be empty" example:"monday.day@email.com"`
+	Age      uint   `json:"age" valid:"required~Age can't be empty" example:"21"`
+	Password string `json:"password" valid:"required~Password can't be empty" example:"secret"`
 }
 
 type UserRequest struct {
-	Email    string `json:"email" validate:"required, unique" example:"yujin.an@email.com"`
-	Password string `json:"password" validate:"required, min=6" example:"secret"`
+	Email    string `json:"email" valid:"required~can't be empty" example:"monday.day@email.com"`
+	Password string `json:"password" valid:"required~can't be empty" example:"secret"`
 }
 
 type UserResponse struct {
