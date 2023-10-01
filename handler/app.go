@@ -30,6 +30,7 @@ func StartApplication() {
 
 	{
 		users.POST("/register", userHandler.Register)
+		users.POST("/login", userHandler.Login)
 	}
 
 	app.Run(":" + config.AppConfig().Port)
