@@ -41,12 +41,12 @@ func (userRepo *userRepositoryImpl) Create(userPayload *entity.User) (int, errs.
 
 	if err != nil {
 		tx.Rollback()
-		return 0, errs.NewInternalServerError("something went wron")
+		return 0, errs.NewInternalServerError("something went wrong")
 	}
 
 	if err := tx.Commit(); err != nil {
 		tx.Rollback()
-		return 0, errs.NewInternalServerError("something went wron")
+		return 0, errs.NewInternalServerError("something went wrong")
 	}
 
 	return id, nil
