@@ -44,7 +44,7 @@ func (userService *userServiceImpl) Add(userPayload *dto.NewUserRequest) (*dto.G
 		StatusCode: http.StatusCreated,
 		Message:    "create new order successfully",
 		Data: dto.UserResponse{
-			Id:       *id,
+			Id:       id,
 			Username: user.Username,
 			Email:    user.Email,
 			Age:      user.Age,
