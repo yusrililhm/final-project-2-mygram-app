@@ -19,6 +19,10 @@ type UserResponse struct {
 	Age      uint   `json:"age"`
 }
 
+type UserLoginResponse struct {
+	Token string `json:"token"`
+}
+
 type GetUserResponse struct {
 	StatusCode int    `json:"statusCode"`
 	Message    string `json:"message"`
