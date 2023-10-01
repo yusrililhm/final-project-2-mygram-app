@@ -4,6 +4,7 @@ import (
 	"myGram/dto"
 	"myGram/entity"
 	"myGram/pkg/errs"
+	"myGram/pkg/helper"
 	"myGram/repository/user_repository"
 	"net/http"
 )
@@ -24,6 +25,12 @@ func NewUserService(userRepo user_repository.UserRepository) UserService {
 
 // Add implements UserService.
 func (userService *userServiceImpl) Add(userPayload *dto.NewUserRequest) (*dto.GetUserResponse, errs.Error) {
+
+	err := helper.ValidateStruct(userPayload)
+
+	if err != nil {
+		return nil, err
+	}
 
 	user := &entity.User{
 		Username: userPayload.Username,
