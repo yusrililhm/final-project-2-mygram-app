@@ -7,4 +7,5 @@ import (
 
 type UserRepository interface {
 	Create(userPayload *entity.User) (int, errs.Error)
+	Fetch(email string) (*entity.User, errs.Error)
 }
