@@ -8,17 +8,21 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type userHandler struct {
+type UserHandler interface {
+	Register(ctx *gin.Context)
+}
+
+type userHandlerImpl struct {
 	userService user_service.UserService
 }
 
-func newUserHandler(userService user_service.UserService) userHandler {
-	return userHandler{
+func NewUserHandler(userService user_service.UserService) UserHandler {
+	return &userHandlerImpl{
 		userService: userService,
 	}
 }
 
-func (uh *userHandler) Register(ctx *gin.Context) {
+func (uh *userHandlerImpl) Register(ctx *gin.Context) {
 	userPayload := &dto.NewUserRequest{}
 
 	if err := ctx.ShouldBindJSON(userPayload); err != nil {
