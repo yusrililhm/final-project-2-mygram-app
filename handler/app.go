@@ -19,13 +19,15 @@ func StartApplication() {
 	// dependencies injection
 	userRepo := user_pg.NewUserRepository(db)
 	userService := user_service.NewUserService(userRepo)
-	userHandler := newUserHandler(userService)
+	userHandler := NewUserHandler(userService)
 
 	app := gin.Default()
 
+	// swagger
+
 	// routing
 	users := app.Group("users")
-	
+
 	{
 		users.POST("/register", userHandler.Register)
 	}
