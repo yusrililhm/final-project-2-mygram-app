@@ -19,6 +19,21 @@ const (
 			($1, $2, $3, $4)
 		RETURNING id
 	`
+
+	fetchUserByEmail = `
+		SELECT
+			id, 
+			username, 
+			email, 
+			password, 
+			age, 
+			created_at, 
+			updated_at
+		FROM
+			users
+		WHERE
+			email = $1
+	`
 )
 
 func NewUserRepository(db *sql.DB) user_repository.UserRepository {
@@ -50,4 +65,28 @@ func (userRepo *userRepositoryImpl) Create(userPayload *entity.User) (int, errs.
 	}
 
 	return id, nil
+}
+
+// Fetch implements user_repository.UserRepository.
+func (userRepo *userRepositoryImpl) Fetch(email string) (*entity.User, errs.Error) {
+
+	user := entity.User{}
+	err := userRepo.db.QueryRow(fetchUserByEmail, email).Scan(
+		&user.Id,
+		&user.Username,
+		&user.Email,
+		&user.Password,
+		&user.Age,
+		&user.CreatedAt,
+		&user.UpdatedAt,
+	)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errs.NewNotFoundError("user not found")
+		}
+		return nil, errs.NewInternalServerError("something went wrong")
+	}
+
+	return &user, nil
 }
