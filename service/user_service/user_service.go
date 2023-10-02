@@ -152,7 +152,7 @@ func (userService *userServiceImpl) Remove(userId int) (*dto.GetUserResponse, er
 
 	if err != nil {
 		if err.Status() == http.StatusNotFound {
-			return nil, errs.NewBadRequestError("invalid email/password")
+			return nil, errs.NewBadRequestError("invalid user")
 		}
 		return nil, err
 	}
