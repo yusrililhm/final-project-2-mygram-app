@@ -24,7 +24,7 @@ type UserUpdateResponse struct {
 	Username  string    `json:"username"`
 	Email     string    `json:"email"`
 	Age       uint      `json:"age"`
-	UpdatedAt time.Time `json:"updatedAt"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 type UserResponse struct {
