@@ -132,13 +132,6 @@ func (userService *userServiceImpl) Edit(userId int, userPayload *dto.UserUpdate
 
 	user, err = userService.userRepo.FetchById(userId)
 
-	if err != nil {
-		if err.Status() == http.StatusNotFound {
-			return nil, errs.NewBadRequestError("user not found")
-		}
-		return nil, err
-	}
-
 	return &dto.GetUserResponse{
 		StatusCode: http.StatusOK,
 		Message:    "user updated successfully",
