@@ -1,6 +1,12 @@
 package auth_service
 
-import "github.com/gin-gonic/gin"
+import (
+	"myGram/entity"
+	"myGram/pkg/errs"
+	"myGram/repository/user_repository"
+
+	"github.com/gin-gonic/gin"
+)
 
 type AuthService interface {
 	Authentication() gin.HandlerFunc
@@ -8,15 +14,39 @@ type AuthService interface {
 }
 
 type authServiceImpl struct {
+	userRepository user_repository.UserRepository
 }
 
-func NewAuthService() AuthService {
-	return &authServiceImpl{}
+func NewAuthService(userRepo user_repository.UserRepository) AuthService {
+	return &authServiceImpl{
+		userRepository: userRepo,
+	}
 }
 
 // Authentication implements AuthService.
 func (authService *authServiceImpl) Authentication() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+
+		invalidToken := errs.NewUnauthenticatedError("invalid token")
+		bearerToken := ctx.GetHeader("Authorization")
+
+		user := entity.User{}
+
+		err := user.ValidateToken(bearerToken)
+
+		if err != nil {
+			ctx.AbortWithStatusJSON(err.Status(), err)
+			return
+		}
+
+		_, err = authService.userRepository.FetchById(user.Id)
+
+		if err != nil {
+			ctx.AbortWithError(invalidToken.Status(), invalidToken)
+			return
+		}
+
+		ctx.Set("userData", user)
 		ctx.Next()
 	}
 }
