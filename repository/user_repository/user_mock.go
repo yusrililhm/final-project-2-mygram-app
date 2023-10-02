@@ -10,6 +10,7 @@ var (
 	Fetch     func(email string) (*entity.User, errs.Error)
 	Update    func(userPayload *entity.User) errs.Error
 	FetchById func(userId int) (*entity.User, errs.Error)
+	Delete    func(userId int) errs.Error
 )
 
 type userRepositoryMock struct {
@@ -37,4 +38,9 @@ func (urm *userRepositoryMock) Update(userPayload *entity.User) errs.Error {
 // FetchById implements UserRepository.
 func (urm *userRepositoryMock) FetchById(userId int) (*entity.User, errs.Error) {
 	return FetchById(userId)
+}
+
+// Delete implements UserRepository.
+func (urm *userRepositoryMock) Delete(userId int) errs.Error {
+	return Delete(userId)
 }
