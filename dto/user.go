@@ -9,12 +9,12 @@ type NewUserRequest struct {
 	Password string `json:"password" valid:"required~Password can't be empty, length(6|255)~Minimum password is 6 length" example:"secret"`
 }
 
-type UserRequest struct {
+type UserLoginRequest struct {
 	Email    string `json:"email" valid:"required~Email can't be empty, email" example:"monday.day@email.com"`
 	Password string `json:"password" valid:"required~Password can't be empty" example:"secret"`
 }
 
-type UserUpdate struct {
+type UserUpdateRequest struct {
 	Username string `json:"username" valid:"required~Username can't be empty" example:"monday"`
 	Email    string `json:"email" valid:"required~Email can't be empty, email" example:"monday.day@email.com"`
 }
