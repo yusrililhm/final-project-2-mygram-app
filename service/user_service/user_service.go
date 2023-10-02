@@ -11,7 +11,8 @@ import (
 
 type UserService interface {
 	Add(userPayload *dto.NewUserRequest) (*dto.GetUserResponse, errs.Error)
-	Get(userPayload *dto.UserRequest) (*dto.GetUserResponse, errs.Error)
+	Get(userPayload *dto.UserLoginRequest) (*dto.GetUserResponse, errs.Error)
+	Edit(userId int, userPayload *dto.UserUpdateRequest) (*dto.GetUserResponse, errs.Error)
 }
 
 type userServiceImpl struct {
@@ -61,7 +62,7 @@ func (userService *userServiceImpl) Add(userPayload *dto.NewUserRequest) (*dto.G
 }
 
 // Get implements UserService.
-func (us *userServiceImpl) Get(userPayload *dto.UserRequest) (*dto.GetUserResponse, errs.Error) {
+func (us *userServiceImpl) Get(userPayload *dto.UserLoginRequest) (*dto.GetUserResponse, errs.Error) {
 
 	err := helper.ValidateStruct(userPayload)
 
@@ -91,6 +92,61 @@ func (us *userServiceImpl) Get(userPayload *dto.UserRequest) (*dto.GetUserRespon
 		Message:    "successfully loged in",
 		Data: dto.TokenResponse{
 			Token: token,
+		},
+	}, nil
+}
+
+// Edit implements UserService.
+func (userService *userServiceImpl) Edit(userId int, userPayload *dto.UserUpdateRequest) (*dto.GetUserResponse, errs.Error) {
+
+	err := helper.ValidateStruct(userPayload)
+
+	if err != nil {
+		return nil, err
+	}
+
+	user, err := userService.userRepo.FetchById(userId)
+
+	if err != nil {
+		if err.Status() == http.StatusNotFound {
+			return nil, errs.NewBadRequestError("invalid email/password")
+		}
+		return nil, err
+	}
+
+	if user.Id != userId {
+		return nil, errs.NewUnauthenticatedError("invalid user")
+	}
+
+	usr := &entity.User{
+		Id:       userId,
+		Email:    userPayload.Email,
+		Username: userPayload.Username,
+	}
+	err = userService.userRepo.Update(usr)
+
+	if err != nil {
+		return nil, err
+	}
+
+	user, err = userService.userRepo.FetchById(userId)
+
+	if err != nil {
+		if err.Status() == http.StatusNotFound {
+			return nil, errs.NewBadRequestError("invalid email/password")
+		}
+		return nil, err
+	}
+
+	return &dto.GetUserResponse{
+		StatusCode: http.StatusOK,
+		Message:    "user updated successfully",
+		Data: dto.UserUpdateResponse{
+			Id:        user.Id,
+			Username:  user.Username,
+			Email:     user.Email,
+			Age:       user.Age,
+			UpdatedAt: user.UpdatedAt,
 		},
 	}, nil
 }
