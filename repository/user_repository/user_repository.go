@@ -10,4 +10,5 @@ type UserRepository interface {
 	Fetch(email string) (*entity.User, errs.Error)
 	FetchById(userId int) (*entity.User, errs.Error)
 	Update(userPayload *entity.User) (errs.Error)
+	Delete(userId int) errs.Error
 }
