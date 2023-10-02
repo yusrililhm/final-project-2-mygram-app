@@ -50,7 +50,7 @@ func (userHandler *userHandlerImpl) Login(ctx *gin.Context) {
 	userPayload := &dto.UserLoginRequest{}
 
 	if err := ctx.ShouldBindJSON(userPayload); err != nil {
-		errBindJson := errs.NewUnprocessableEntityError("invalid json body request " + err.Error())
+		errBindJson := errs.NewUnprocessableEntityError("invalid json body request")
 		ctx.AbortWithStatusJSON(errBindJson.Status(), errBindJson)
 		return
 	}
@@ -72,7 +72,7 @@ func (userHandler *userHandlerImpl) Update(ctx *gin.Context) {
 	userPayload := &dto.UserUpdateRequest{}
 
 	if err := ctx.ShouldBindJSON(userPayload); err != nil {
-		errBindJson := errs.NewUnprocessableEntityError("invalid json body request " + err.Error())
+		errBindJson := errs.NewUnprocessableEntityError("invalid json body request")
 		ctx.AbortWithStatusJSON(errBindJson.Status(), errBindJson)
 		return
 	}
