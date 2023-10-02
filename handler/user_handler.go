@@ -13,6 +13,7 @@ type UserHandler interface {
 	Register(ctx *gin.Context)
 	Login(ctx *gin.Context)
 	Update(ctx *gin.Context)
+	Delete(ctx *gin.Context)
 }
 
 type userHandlerImpl struct {
@@ -66,7 +67,7 @@ func (uh *userHandlerImpl) Login(ctx *gin.Context) {
 
 // Update implements UserHandler.
 func (uh *userHandlerImpl) Update(ctx *gin.Context) {
-	userId := ctx.MustGet("userData").(entity.User)
+	user := ctx.MustGet("userData").(entity.User)
 
 	userPayload := &dto.UserUpdateRequest{}
 
@@ -76,7 +77,22 @@ func (uh *userHandlerImpl) Update(ctx *gin.Context) {
 		return
 	}
 
-	response, err := uh.userService.Edit(userId.Id, userPayload)
+	response, err := uh.userService.Edit(user.Id, userPayload)
+
+	if err != nil {
+		ctx.AbortWithStatusJSON(err.Status(), err)
+		return
+	}
+
+	ctx.JSON(response.StatusCode, response)
+}
+
+// Delete implements UserHandler.
+func (uh *userHandlerImpl) Delete(ctx *gin.Context) {
+
+	user := ctx.MustGet("userData").(entity.User)
+
+	response, err := uh.userService.Remove(user.Id)
 
 	if err != nil {
 		ctx.AbortWithStatusJSON(err.Status(), err)
