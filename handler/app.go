@@ -35,6 +35,7 @@ func StartApplication() {
 		users.POST("/register", userHandler.Register)
 		users.POST("/login", userHandler.Login)
 		users.PUT("", authService.Authentication(), userHandler.Update)
+		users.DELETE("", authService.Authentication(), userHandler.Delete)
 	}
 
 	app.Run(":" + config.AppConfig().Port)
