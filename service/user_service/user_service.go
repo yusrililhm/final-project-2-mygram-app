@@ -13,6 +13,7 @@ type UserService interface {
 	Add(userPayload *dto.NewUserRequest) (*dto.GetUserResponse, errs.Error)
 	Get(userPayload *dto.UserLoginRequest) (*dto.GetUserResponse, errs.Error)
 	Edit(userId int, userPayload *dto.UserUpdateRequest) (*dto.GetUserResponse, errs.Error)
+	Remove(userId int) (*dto.GetUserResponse, errs.Error)
 }
 
 type userServiceImpl struct {
@@ -115,7 +116,7 @@ func (userService *userServiceImpl) Edit(userId int, userPayload *dto.UserUpdate
 	}
 
 	if user.Id != userId {
-		return nil, errs.NewUnauthenticatedError("invalid user")
+		return nil, errs.NewNotFoundError("invalid user")
 	}
 
 	usr := &entity.User{
@@ -148,5 +149,34 @@ func (userService *userServiceImpl) Edit(userId int, userPayload *dto.UserUpdate
 			Age:       user.Age,
 			UpdatedAt: user.UpdatedAt,
 		},
+	}, nil
+}
+
+// Remove implements UserService.
+func (userService *userServiceImpl) Remove(userId int) (*dto.GetUserResponse, errs.Error) {
+
+	user, err := userService.userRepo.FetchById(userId)
+
+	if err != nil {
+		if err.Status() == http.StatusNotFound {
+			return nil, errs.NewBadRequestError("invalid email/password")
+		}
+		return nil, err
+	}
+
+	if user.Id != userId {
+		return nil, errs.NewNotFoundError("invalid user")
+	}
+
+	err = userService.userRepo.Delete(userId)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &dto.GetUserResponse{
+		StatusCode: http.StatusOK,
+		Message:    "Your account has been successfully deleted",
+		Data:       nil,
 	}, nil
 }
