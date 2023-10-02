@@ -1,6 +1,7 @@
 package entity
 
 import (
+	"myGram/infra/config"
 	"myGram/pkg/errs"
 	"strings"
 	"time"
@@ -28,7 +29,7 @@ func (u *User) parseToken(tokenString string) (*jwt.Token, errs.Error) {
 			return nil, invalidToken
 		}
 
-		return []byte(""), nil
+		return []byte(config.AppConfig().JwtSecretKey), nil
 	})
 
 	if err != nil {
@@ -52,7 +53,7 @@ func (u *User) bindTokenToUserEntity(claims jwt.MapClaims) errs.Error {
 		u.Username = username
 	}
 
-	if email, ok := claims["id"].(string); !ok {
+	if email, ok := claims["email"].(string); !ok {
 		return invalidToken
 	} else {
 		u.Email = email
@@ -63,7 +64,7 @@ func (u *User) bindTokenToUserEntity(claims jwt.MapClaims) errs.Error {
 
 func (u *User) ValidateToken(bearerToken string) errs.Error {
 
-	isBearer := strings.HasPrefix("Bearer", bearerToken)
+	isBearer := strings.HasPrefix(bearerToken, "Bearer")
 
 	if !isBearer {
 		return invalidToken
@@ -105,7 +106,7 @@ func (u *User) tokenClaim() jwt.MapClaims {
 
 func (u *User) signToken(claims jwt.MapClaims) string {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, _ := token.SignedString([]byte(""))
+	tokenString, _ := token.SignedString([]byte(config.AppConfig().JwtSecretKey))
 	return tokenString
 }
 
