@@ -110,7 +110,7 @@ func (userService *userServiceImpl) Edit(userId int, userPayload *dto.UserUpdate
 
 	if err != nil {
 		if err.Status() == http.StatusNotFound {
-			return nil, errs.NewBadRequestError("invalid email/password")
+			return nil, errs.NewBadRequestError("invalid user")
 		}
 		return nil, err
 	}
