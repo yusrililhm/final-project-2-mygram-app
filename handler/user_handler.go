@@ -2,6 +2,7 @@ package handler
 
 import (
 	"myGram/dto"
+	"myGram/entity"
 	"myGram/pkg/errs"
 	"myGram/service/user_service"
 
@@ -11,6 +12,7 @@ import (
 type UserHandler interface {
 	Register(ctx *gin.Context)
 	Login(ctx *gin.Context)
+	Update(ctx *gin.Context)
 }
 
 type userHandlerImpl struct {
@@ -44,7 +46,7 @@ func (uh *userHandlerImpl) Register(ctx *gin.Context) {
 
 // Login implements UserHandler.
 func (uh *userHandlerImpl) Login(ctx *gin.Context) {
-	userPayload := &dto.UserRequest{}
+	userPayload := &dto.UserLoginRequest{}
 
 	if err := ctx.ShouldBindJSON(userPayload); err != nil {
 		errBindJson := errs.NewUnprocessableEntityError("invalid json body request " + err.Error())
@@ -53,6 +55,28 @@ func (uh *userHandlerImpl) Login(ctx *gin.Context) {
 	}
 
 	response, err := uh.userService.Get(userPayload)
+
+	if err != nil {
+		ctx.AbortWithStatusJSON(err.Status(), err)
+		return
+	}
+
+	ctx.JSON(response.StatusCode, response)
+}
+
+// Update implements UserHandler.
+func (uh *userHandlerImpl) Update(ctx *gin.Context) {
+	userId := ctx.MustGet("userData").(entity.User)
+
+	userPayload := &dto.UserUpdateRequest{}
+
+	if err := ctx.ShouldBindJSON(userPayload); err != nil {
+		errBindJson := errs.NewUnprocessableEntityError("invalid json body request " + err.Error())
+		ctx.AbortWithStatusJSON(errBindJson.Status(), errBindJson)
+		return
+	}
+
+	response, err := uh.userService.Edit(userId.Id, userPayload)
 
 	if err != nil {
 		ctx.AbortWithStatusJSON(err.Status(), err)
