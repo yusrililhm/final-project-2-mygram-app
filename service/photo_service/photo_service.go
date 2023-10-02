@@ -1,9 +1,16 @@
 package photo_service
 
-import "myGram/repository/photo_repository"
+import (
+	"myGram/dto"
+	"myGram/entity"
+	"myGram/pkg/errs"
+	"myGram/pkg/helper"
+	"myGram/repository/photo_repository"
+	"net/http"
+)
 
 type PhotoService interface {
-	
+	AddPhoto(userId int, photoPayload *dto.NewPhotoRequest) (*dto.GetPhotoResponse, errs.Error)
 }
 
 type photoServiceImpl struct {
@@ -14,4 +21,33 @@ func NewPhotoService(photoRepository photo_repository.PhotoRepository) PhotoServ
 	return &photoServiceImpl{
 		pr: photoRepository,
 	}
+}
+
+// AddPhoto implements PhotoService.
+func (photoService *photoServiceImpl) AddPhoto(userId int, photoPayload *dto.NewPhotoRequest) (*dto.GetPhotoResponse, errs.Error) {
+
+	err := helper.ValidateStruct(photoPayload)
+
+	if err != nil {
+		return nil, err
+	}
+
+	photo := &entity.Photo{
+		Title:    photoPayload.Title,
+		Caption:  photoPayload.Caption,
+		PhotoUrl: photoPayload.PhotoUrl,
+		UserId:   userId,
+	}
+
+	response, err := photoService.pr.AddPhoto(photo)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &dto.GetPhotoResponse{
+		StatusCode: http.StatusCreated,
+		Message:    "Add new photo successfully",
+		Data:       response,
+	}, nil
 }
