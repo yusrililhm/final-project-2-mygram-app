@@ -42,7 +42,7 @@ func (authService *authServiceImpl) Authentication() gin.HandlerFunc {
 		_, err = authService.userRepository.FetchById(user.Id)
 
 		if err != nil {
-			ctx.AbortWithError(invalidToken.Status(), invalidToken)
+			ctx.AbortWithStatusJSON(invalidToken.Status(), invalidToken)
 			return
 		}
 
