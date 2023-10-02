@@ -60,6 +60,14 @@ const (
 		WHERE
 			id = $1
 	`
+
+	deleteUserQuery = `
+		DELETE
+		FROM
+			users
+		WHERE
+			id = $1
+	`
 )
 
 func NewUserRepository(db *sql.DB) user_repository.UserRepository {
@@ -164,4 +172,26 @@ func (userRepo *userRepositoryImpl) FetchById(userId int) (*entity.User, errs.Er
 	}
 
 	return &user, nil
+}
+
+// Delete implements user_repository.UserRepository.
+func (userRepo *userRepositoryImpl) Delete(userId int) errs.Error {
+	tx, err := userRepo.db.Begin()
+
+	if err != nil {
+		tx.Rollback()
+		return errs.NewInternalServerError("something went wrong")
+	}
+
+	_, err = tx.Exec(deleteUserQuery, userId)
+
+	if err != nil {
+		return errs.NewInternalServerError("something went wrong")
+	}
+
+	if err := tx.Commit(); err != nil {
+		return errs.NewInternalServerError("something went wrong")
+	}
+
+	return nil
 }
