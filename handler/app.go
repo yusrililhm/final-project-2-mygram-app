@@ -4,6 +4,7 @@ import (
 	"myGram/infra/config"
 	"myGram/infra/database"
 	"myGram/repository/user_repository/user_pg"
+	"myGram/service/auth_service"
 	"myGram/service/user_service"
 
 	"github.com/gin-gonic/gin"
@@ -21,6 +22,8 @@ func StartApplication() {
 	userService := user_service.NewUserService(userRepo)
 	userHandler := NewUserHandler(userService)
 
+	authService := auth_service.NewAuthService(userRepo)
+
 	app := gin.Default()
 
 	// swagger
@@ -31,6 +34,7 @@ func StartApplication() {
 	{
 		users.POST("/register", userHandler.Register)
 		users.POST("/login", userHandler.Login)
+		users.PUT("", authService.Authentication(), userHandler.Update)
 	}
 
 	app.Run(":" + config.AppConfig().Port)
