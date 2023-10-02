@@ -34,6 +34,32 @@ const (
 		WHERE
 			email = $1
 	`
+
+	fetchUserById = `
+		SELECT
+			id, 
+			username, 
+			email, 
+			password, 
+			age, 
+			created_at, 
+			updated_at
+		FROM
+			users
+		WHERE
+			id = $1
+	`
+
+	updateUserQuery = `
+		UPDATE 
+			users
+		SET
+			username= $2,
+			email= $3,
+			updated_at = now()
+		WHERE
+			id = $1
+	`
 )
 
 func NewUserRepository(db *sql.DB) user_repository.UserRepository {
@@ -72,6 +98,55 @@ func (userRepo *userRepositoryImpl) Fetch(email string) (*entity.User, errs.Erro
 
 	user := entity.User{}
 	err := userRepo.db.QueryRow(fetchUserByEmail, email).Scan(
+		&user.Id,
+		&user.Username,
+		&user.Email,
+		&user.Password,
+		&user.Age,
+		&user.CreatedAt,
+		&user.UpdatedAt,
+	)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errs.NewNotFoundError("user not found")
+		}
+		return nil, errs.NewInternalServerError("something went wrong")
+	}
+
+	return &user, nil
+}
+
+// Update implements user_repository.UserRepository.
+func (userRepo *userRepositoryImpl) Update(userPayload *entity.User) errs.Error {
+
+	tx, err := userRepo.db.Begin()
+
+	if err != nil {
+		tx.Rollback()
+		return errs.NewInternalServerError("something went wrong " + err.Error())
+	}
+
+	_, err = tx.Exec(updateUserQuery, userPayload.Id, userPayload.Username, userPayload.Email)
+
+	if err != nil {
+		tx.Rollback()
+		return errs.NewInternalServerError("something went wrong" + err.Error())
+	}
+
+	if err := tx.Commit(); err != nil {
+		tx.Rollback()
+		return errs.NewInternalServerError("something went wrong" + err.Error())
+	}
+
+	return nil
+}
+
+// FetchById implements user_repository.UserRepository.
+func (userRepo *userRepositoryImpl) FetchById(userId int) (*entity.User, errs.Error) {
+
+	user := entity.User{}
+	err := userRepo.db.QueryRow(fetchUserById, userId).Scan(
 		&user.Id,
 		&user.Username,
 		&user.Email,
