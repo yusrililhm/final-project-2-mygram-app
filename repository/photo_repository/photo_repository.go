@@ -8,4 +8,5 @@ import (
 
 type PhotoRepository interface {
 	AddPhoto(photoPayload *entity.Photo) (*dto.PhotoResponse, errs.Error)
+	GetPhotos() ([]PhotoUserMapped, errs.Error)
 }
