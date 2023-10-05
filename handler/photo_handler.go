@@ -54,7 +54,14 @@ func (photoHandler *photoHandlerImpl) DeletePhoto(ctx *gin.Context) {
 
 // GetPhotos implements PhotoHandler.
 func (photoHandler *photoHandlerImpl) GetPhotos(ctx *gin.Context) {
+	response, err := photoHandler.ps.GetPhotos()
 
+	if err != nil {
+		ctx.AbortWithStatusJSON(err.Status(), err)
+		return
+	}
+
+	ctx.JSON(response.StatusCode, response)
 }
 
 // UpdatePhoto implements PhotoHandler.
