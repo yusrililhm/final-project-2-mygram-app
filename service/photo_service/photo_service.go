@@ -11,6 +11,7 @@ import (
 
 type PhotoService interface {
 	AddPhoto(userId int, photoPayload *dto.NewPhotoRequest) (*dto.GetPhotoResponse, errs.Error)
+	GetPhotos() (*dto.GetPhotoResponse, errs.Error)
 }
 
 type photoServiceImpl struct {
@@ -49,5 +50,21 @@ func (photoService *photoServiceImpl) AddPhoto(userId int, photoPayload *dto.New
 		StatusCode: http.StatusCreated,
 		Message:    "Add new photo successfully",
 		Data:       response,
+	}, nil
+}
+
+// GetPhotos implements PhotoService.
+func (photoService *photoServiceImpl) GetPhotos() (*dto.GetPhotoResponse, errs.Error) {
+
+	result, err := photoService.pr.GetPhotos()
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &dto.GetPhotoResponse{
+		StatusCode: http.StatusOK,
+		Message:    "fetch photos successfully",
+		Data:       result,
 	}, nil
 }
