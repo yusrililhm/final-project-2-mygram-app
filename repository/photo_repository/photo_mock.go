@@ -7,7 +7,8 @@ import (
 )
 
 var (
-	AddPhoto func(photoPayload *entity.Photo) (*dto.PhotoResponse, errs.Error)
+	AddPhoto  func(photoPayload *entity.Photo) (*dto.PhotoResponse, errs.Error)
+	GetPhotos func() ([]PhotoUserMapped, errs.Error)
 )
 
 type photoRepositoryMock struct {
@@ -20,4 +21,9 @@ func NewPhotoRepositoryMock() PhotoRepository {
 // AddPhoto implements PhotoRepository.
 func (prm *photoRepositoryMock) AddPhoto(photoPayload *entity.Photo) (*dto.PhotoResponse, errs.Error) {
 	return AddPhoto(photoPayload)
+}
+
+// GetPhotos implements PhotoRepository.
+func (prm *photoRepositoryMock) GetPhotos() ([]PhotoUserMapped, errs.Error) {
+	return GetPhotos()
 }
