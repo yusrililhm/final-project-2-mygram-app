@@ -28,6 +28,28 @@ const (
 		RETURNING
 				id
 	`
+
+	getUserAndPhotos = `
+				SELECT
+					p.id,
+					p.title,
+					p.caption,
+					p.photo_url,
+					p.user_id,
+					p.created_at,
+					p.updated_at,
+					u.email,
+					u.username
+				FROM
+					photos as p
+				LEFT JOIN
+					users AS u
+				ON
+					p.user_id = u.id
+				ORDER BY
+					p.id
+				ASC
+	`
 )
 
 func NewPhotoRepository(db *sql.DB) photo_repository.PhotoRepository {
@@ -69,4 +91,43 @@ func (photoRepo *photoRepositoryImpl) AddPhoto(photoPayload *entity.Photo) (*dto
 		UserId:    photoPayload.UserId,
 		CreatedAt: time.Now(),
 	}, nil
+}
+
+// GetPhotos implements photo_repository.PhotoRepository.
+func (photoRepo *photoRepositoryImpl) GetPhotos() ([]photo_repository.PhotoUserMapped, errs.Error) {
+
+	photosUser := []photo_repository.PhotoUser{}
+	rows, err := photoRepo.db.Query(getUserAndPhotos)
+
+	if err != nil {
+		return nil, errs.NewInternalServerError("something went wrong " + err.Error())
+	}
+
+	for rows.Next() {
+		photoUser := photo_repository.PhotoUser{}
+
+		err = rows.Scan(
+			&photoUser.Photo.Id,
+			&photoUser.Photo.Title,
+			&photoUser.Photo.Caption,
+			&photoUser.Photo.PhotoUrl,
+			&photoUser.Photo.UserId,
+			&photoUser.Photo.CreatedAt,
+			&photoUser.Photo.UpdatedAt,
+			&photoUser.User.Email,
+			&photoUser.User.Username,
+		)
+
+		if err != nil {
+			if err == sql.ErrNoRows {
+				return nil, errs.NewNotFoundError("photos not found" + err.Error())
+			}
+			return nil, errs.NewInternalServerError("something went wrong " + err.Error())
+		}
+
+		photosUser = append(photosUser, photoUser)
+	}
+
+	result := photo_repository.PhotoUserMapped{}
+	return result.HandleMappingPhotoWithUser(photosUser), nil
 }
