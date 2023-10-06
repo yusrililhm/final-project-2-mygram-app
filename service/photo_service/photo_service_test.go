@@ -75,3 +75,48 @@ func TestPhotoService_AddPhoto_Success(t *testing.T) {
 	assert.NotNil(t, response)
 	assert.Equal(t, http.StatusCreated, response.StatusCode)
 }
+
+func TestPhotoService_GetPhotos_ServerError_Fail(t *testing.T)  {
+	photoRepo := photo_repository.NewPhotoRepositoryMock()
+	photoService := photo_service.NewPhotoService(photoRepo)
+
+	photo_repository.GetPhotos = func() ([]photo_repository.PhotoUserMapped, errs.Error) {
+		return nil, errs.NewInternalServerError("something went wrong")
+	}
+
+	response, err := photoService.GetPhotos()
+
+	assert.Nil(t, response)
+	assert.NotNil(t, err)
+	assert.Equal(t, http.StatusInternalServerError, err.Status())
+}
+
+func TestPhotoService_GetPhotos_PhotoNotFound_Fail(t *testing.T)  {
+	photoRepo := photo_repository.NewPhotoRepositoryMock()
+	photoService := photo_service.NewPhotoService(photoRepo)
+
+	photo_repository.GetPhotos = func() ([]photo_repository.PhotoUserMapped, errs.Error) {
+		return nil, errs.NewNotFoundError("photos not found")
+	}
+
+	response, err := photoService.GetPhotos()
+
+	assert.Nil(t, response)
+	assert.NotNil(t, err)
+	assert.Equal(t, http.StatusNotFound, err.Status())
+}
+
+func TestPhotoService_GetPhotos_Success(t *testing.T)  {
+	photoRepo := photo_repository.NewPhotoRepositoryMock()
+	photoService := photo_service.NewPhotoService(photoRepo)
+
+	photo_repository.GetPhotos = func() ([]photo_repository.PhotoUserMapped, errs.Error) {
+		return []photo_repository.PhotoUserMapped{}, nil
+	}
+
+	response, err := photoService.GetPhotos()
+
+	assert.Nil(t, err)
+	assert.NotNil(t, response)
+	assert.Equal(t, http.StatusOK, response.StatusCode)
+}
