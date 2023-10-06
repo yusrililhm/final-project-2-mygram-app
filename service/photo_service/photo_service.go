@@ -59,6 +59,9 @@ func (photoService *photoServiceImpl) GetPhotos() (*dto.GetPhotoResponse, errs.E
 	result, err := photoService.pr.GetPhotos()
 
 	if err != nil {
+		if err.Status() == http.StatusNotFound {
+			return nil, err
+		}
 		return nil, err
 	}
 
