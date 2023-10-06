@@ -7,8 +7,10 @@ import (
 )
 
 var (
-	AddPhoto  func(photoPayload *entity.Photo) (*dto.PhotoResponse, errs.Error)
-	GetPhotos func() ([]PhotoUserMapped, errs.Error)
+	AddPhoto    func(photoPayload *entity.Photo) (*dto.PhotoResponse, errs.Error)
+	GetPhotos   func() ([]PhotoUserMapped, errs.Error)
+	GetPhotoId  func(photoId int) (*PhotoUserMapped, errs.Error)
+	UpdatePhoto func(photoId int, photoPayload *entity.Photo) errs.Error
 )
 
 type photoRepositoryMock struct {
@@ -26,4 +28,14 @@ func (prm *photoRepositoryMock) AddPhoto(photoPayload *entity.Photo) (*dto.Photo
 // GetPhotos implements PhotoRepository.
 func (prm *photoRepositoryMock) GetPhotos() ([]PhotoUserMapped, errs.Error) {
 	return GetPhotos()
+}
+
+// GetPhotoId implements PhotoRepository.
+func (prm *photoRepositoryMock) GetPhotoId(photoId int) (*PhotoUserMapped, errs.Error) {
+	return GetPhotoId(photoId)
+}
+
+// UpdatePhoto implements PhotoRepository.
+func (prm *photoRepositoryMock) UpdatePhoto(photoId int, photoPayload *entity.Photo) errs.Error {
+	return UpdatePhoto(photoId, photoPayload)
 }
