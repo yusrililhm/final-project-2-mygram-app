@@ -3,23 +3,27 @@ package auth_service
 import (
 	"myGram/entity"
 	"myGram/pkg/errs"
+	"myGram/repository/photo_repository"
 	"myGram/repository/user_repository"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
 type AuthService interface {
 	Authentication() gin.HandlerFunc
-	Authorization() gin.HandlerFunc
+	AuthorizationPhoto() gin.HandlerFunc
 }
 
 type authServiceImpl struct {
-	userRepository user_repository.UserRepository
+	userRepository  user_repository.UserRepository
+	photoRepository photo_repository.PhotoRepository
 }
 
-func NewAuthService(userRepo user_repository.UserRepository) AuthService {
+func NewAuthService(userRepo user_repository.UserRepository, photoRepo photo_repository.PhotoRepository) AuthService {
 	return &authServiceImpl{
-		userRepository: userRepo,
+		userRepository:  userRepo,
+		photoRepository: photoRepo,
 	}
 }
 
@@ -51,9 +55,25 @@ func (authService *authServiceImpl) Authentication() gin.HandlerFunc {
 	}
 }
 
-// Authorization implements AuthService.
-func (authService *authServiceImpl) Authorization() gin.HandlerFunc {
+// AuthorizationPhoto implements AuthService.
+func (authService *authServiceImpl) AuthorizationPhoto() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		user := ctx.MustGet("userData").(entity.User)
+
+		photoId, _ := strconv.Atoi(ctx.Param("photoId"))
+
+		photo, err := authService.photoRepository.GetPhotoId(photoId)
+
+		if err != nil {
+			ctx.AbortWithStatusJSON(err.Status(), err)
+			return
+		}
+
+		if photo.UserId != user.Id {
+			errUnathorized := errs.NewUnathorizedError("you are not authorized to modify the movie data")
+			ctx.AbortWithStatusJSON(errUnathorized.Status(), errUnathorized)
+		}
+
 		ctx.Next()
 	}
 }
