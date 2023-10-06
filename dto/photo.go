@@ -17,6 +17,15 @@ type PhotoResponse struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
+type PhotoUpdateResponse struct {
+	Id        int       `json:"id"`
+	Title     string    `json:"title"`
+	Caption   string    `json:"caption"`
+	PhotoUrl  string    `json:"photo_url"`
+	UserId    int       `json:"user_id"`
+	UpdatedAt time.Time `json:"updated_at"`
+}
+
 type GetPhotoResponse struct {
 	StatusCode int    `json:"statusCode"`
 	Message    string `json:"message"`
