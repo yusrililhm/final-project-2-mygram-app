@@ -49,8 +49,8 @@ func StartApplication() {
 	{
 		photos.POST("", authService.Authentication(), photoHandler.AddPhoto)
 		photos.GET("", authService.Authentication(), photoHandler.GetPhotos)
-		photos.PUT("/photoId", authService.Authentication(), authService.AuthorizationPhoto(), photoHandler.UpdatePhoto)
-		photos.DELETE("/photoId", authService.Authentication(), authService.AuthorizationPhoto(), photoHandler.DeletePhoto)
+		photos.PUT("/:photoId", authService.Authentication(), authService.AuthorizationPhoto(), photoHandler.UpdatePhoto)
+		photos.DELETE("/:photoId", authService.Authentication(), authService.AuthorizationPhoto(), photoHandler.DeletePhoto)
 	}
 
 	app.Run(":" + config.AppConfig().Port)
