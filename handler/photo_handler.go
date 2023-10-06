@@ -5,6 +5,7 @@ import (
 	"myGram/entity"
 	"myGram/pkg/errs"
 	"myGram/service/photo_service"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -66,5 +67,23 @@ func (photoHandler *photoHandlerImpl) GetPhotos(ctx *gin.Context) {
 
 // UpdatePhoto implements PhotoHandler.
 func (photoHandler *photoHandlerImpl) UpdatePhoto(ctx *gin.Context) {
+	photoId, _ := strconv.Atoi(ctx.Param("photoId"))
+	_ = photoId
 
+	photoPayload := &dto.NewPhotoRequest{}
+
+	if err := ctx.ShouldBindJSON(photoPayload); err != nil {
+		errBindJson := errs.NewUnprocessableEntityError("invalid json body request")
+		ctx.AbortWithStatusJSON(errBindJson.Status(), errBindJson)
+		return
+	}
+
+	response, err := photoHandler.ps.UpdatePhoto(photoId, photoPayload)
+
+	if err != nil {
+		ctx.AbortWithStatusJSON(err.Status(), err)
+		return
+	}
+
+	ctx.JSON(response.StatusCode, response)
 }
