@@ -76,7 +76,7 @@ func TestPhotoService_AddPhoto_Success(t *testing.T) {
 	assert.Equal(t, http.StatusCreated, response.StatusCode)
 }
 
-func TestPhotoService_GetPhotos_ServerError_Fail(t *testing.T)  {
+func TestPhotoService_GetPhotos_ServerError_Fail(t *testing.T) {
 	photoRepo := photo_repository.NewPhotoRepositoryMock()
 	photoService := photo_service.NewPhotoService(photoRepo)
 
@@ -91,7 +91,7 @@ func TestPhotoService_GetPhotos_ServerError_Fail(t *testing.T)  {
 	assert.Equal(t, http.StatusInternalServerError, err.Status())
 }
 
-func TestPhotoService_GetPhotos_PhotoNotFound_Fail(t *testing.T)  {
+func TestPhotoService_GetPhotos_PhotoNotFound_Fail(t *testing.T) {
 	photoRepo := photo_repository.NewPhotoRepositoryMock()
 	photoService := photo_service.NewPhotoService(photoRepo)
 
@@ -106,7 +106,7 @@ func TestPhotoService_GetPhotos_PhotoNotFound_Fail(t *testing.T)  {
 	assert.Equal(t, http.StatusNotFound, err.Status())
 }
 
-func TestPhotoService_GetPhotos_Success(t *testing.T)  {
+func TestPhotoService_GetPhotos_Success(t *testing.T) {
 	photoRepo := photo_repository.NewPhotoRepositoryMock()
 	photoService := photo_service.NewPhotoService(photoRepo)
 
@@ -115,6 +115,120 @@ func TestPhotoService_GetPhotos_Success(t *testing.T)  {
 	}
 
 	response, err := photoService.GetPhotos()
+
+	assert.Nil(t, err)
+	assert.NotNil(t, response)
+	assert.Equal(t, http.StatusOK, response.StatusCode)
+}
+
+func TestPhotoService_UpdatePhoto_InvalidRequest_Fail(t *testing.T) {
+
+	photoPayload := &dto.NewPhotoRequest{}
+
+	photoRepo := photo_repository.NewPhotoRepositoryMock()
+	photoService := photo_service.NewPhotoService(photoRepo)
+
+	response, err := photoService.UpdatePhoto(2, photoPayload)
+
+	assert.Nil(t, response)
+	assert.NotNil(t, err)
+	assert.Equal(t, http.StatusBadRequest, err.Status())
+}
+
+func TestPhotoService_UpdatePhoto_ServerError_Fail(t *testing.T) {
+
+	photoPayload := &dto.NewPhotoRequest{
+		Title:    "momon",
+		PhotoUrl: "https://google.com",
+		Caption:  "lorem ipsum",
+	}
+
+	photoRepo := photo_repository.NewPhotoRepositoryMock()
+	photoService := photo_service.NewPhotoService(photoRepo)
+
+	photo_repository.UpdatePhoto = func(photoId int, photoPayload *entity.Photo) errs.Error {
+		return errs.NewInternalServerError("something went wrong")
+	}
+
+	response, err := photoService.UpdatePhoto(2, photoPayload)
+
+	assert.Nil(t, response)
+	assert.NotNil(t, err)
+	assert.Equal(t, http.StatusInternalServerError, err.Status())
+}
+
+func TestPhotoService_UpdatePhoto_GetPhotoNotFound_Fail(t *testing.T) {
+
+	photoPayload := &dto.NewPhotoRequest{
+		Title:    "momon",
+		PhotoUrl: "https://google.com",
+		Caption:  "lorem ipsum",
+	}
+
+	photoRepo := photo_repository.NewPhotoRepositoryMock()
+	photoService := photo_service.NewPhotoService(photoRepo)
+
+	photo_repository.UpdatePhoto = func(photoId int, photoPayload *entity.Photo) errs.Error {
+		return nil
+	}
+
+	photo_repository.GetPhotoId = func(photoId int) (*photo_repository.PhotoUserMapped, errs.Error) {
+		return nil, errs.NewNotFoundError("photo not found")
+	}
+
+	response, err := photoService.UpdatePhoto(2, photoPayload)
+
+	assert.Nil(t, response)
+	assert.NotNil(t, err)
+	assert.Equal(t, http.StatusNotFound, err.Status())
+}
+
+func TestPhotoService_UpdatePhoto_GetPhotoServerError_Fail(t *testing.T) {
+
+	photoPayload := &dto.NewPhotoRequest{
+		Title:    "momon",
+		PhotoUrl: "https://google.com",
+		Caption:  "lorem ipsum",
+	}
+
+	photoRepo := photo_repository.NewPhotoRepositoryMock()
+	photoService := photo_service.NewPhotoService(photoRepo)
+
+	photo_repository.UpdatePhoto = func(photoId int, photoPayload *entity.Photo) errs.Error {
+		return nil
+	}
+
+	photo_repository.GetPhotoId = func(photoId int) (*photo_repository.PhotoUserMapped, errs.Error) {
+		return nil, errs.NewInternalServerError("something went wrong")
+	}
+
+	response, err := photoService.UpdatePhoto(2, photoPayload)
+
+	assert.Nil(t, response)
+	assert.NotNil(t, err)
+	assert.Equal(t, http.StatusInternalServerError, err.Status())
+}
+
+func TestPhotoService_UpdatePhoto_Success(t *testing.T) {
+
+	photoPayload := &dto.NewPhotoRequest{
+		Title:    "momon",
+		PhotoUrl: "https://google.com",
+		Caption:  "lorem ipsum",
+	}
+
+	photoRepo := photo_repository.NewPhotoRepositoryMock()
+	photoService := photo_service.NewPhotoService(photoRepo)
+
+	photo_repository.UpdatePhoto = func(photoId int, photoPayload *entity.Photo) errs.Error {
+		return nil
+	}
+
+	photo_repository.GetPhotoId = func(photoId int) (*photo_repository.PhotoUserMapped, errs.Error) {
+		return &photo_repository.PhotoUserMapped{}, nil
+	}
+
+	response, err := photoService.UpdatePhoto(2, photoPayload)
 
 	assert.Nil(t, err)
 	assert.NotNil(t, response)
