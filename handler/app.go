@@ -28,7 +28,7 @@ func StartApplication() {
 	photoService := photo_service.NewPhotoService(photoRepository)
 	photoHandler := NewPhotoHandler(photoService)
 
-	authService := auth_service.NewAuthService(userRepo)
+	authService := auth_service.NewAuthService(userRepo, photoRepository)
 
 	app := gin.Default()
 
@@ -49,8 +49,8 @@ func StartApplication() {
 	{
 		photos.POST("", authService.Authentication(), photoHandler.AddPhoto)
 		photos.GET("", authService.Authentication(), photoHandler.GetPhotos)
-		photos.PUT("/photoId", authService.Authentication(), authService.Authorization(), photoHandler.UpdatePhoto)
-		photos.DELETE("/photoId", authService.Authentication(), authService.Authorization(), photoHandler.DeletePhoto)
+		photos.PUT("/photoId", authService.Authentication(), authService.AuthorizationPhoto(), photoHandler.UpdatePhoto)
+		photos.DELETE("/photoId", authService.Authentication(), authService.AuthorizationPhoto(), photoHandler.DeletePhoto)
 	}
 
 	app.Run(":" + config.AppConfig().Port)
