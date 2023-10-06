@@ -76,13 +76,19 @@ func (photoService *photoServiceImpl) GetPhotos() (*dto.GetPhotoResponse, errs.E
 // UpdatePhoto implements PhotoService.
 func (photoService *photoServiceImpl) UpdatePhoto(photoId int, photoPayload *dto.NewPhotoRequest) (*dto.GetPhotoResponse, errs.Error) {
 
+	err := helper.ValidateStruct(photoPayload)
+
+	if err != nil {
+		return nil, err
+	}
+
 	photo := &entity.Photo{
 		Title:    photoPayload.Title,
 		Caption:  photoPayload.Caption,
 		PhotoUrl: photoPayload.PhotoUrl,
 	}
 
-	err := photoService.pr.UpdatePhoto(photoId, photo)
+	err = photoService.pr.UpdatePhoto(photoId, photo)
 
 	if err != nil {
 		return nil, err
