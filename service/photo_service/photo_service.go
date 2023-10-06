@@ -97,6 +97,9 @@ func (photoService *photoServiceImpl) UpdatePhoto(photoId int, photoPayload *dto
 	response, err := photoService.pr.GetPhotoId(photoId)
 
 	if err != nil {
+		if err.Status() == http.StatusNotFound {
+			return nil, err
+		}
 		return nil, err
 	}
 
