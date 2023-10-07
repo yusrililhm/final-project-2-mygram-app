@@ -1,14 +1,15 @@
 package user_repository
 
 import (
+	"myGram/dto"
 	"myGram/entity"
 	"myGram/pkg/errs"
 )
 
 var (
-	Create    func(userPayload *entity.User) (int, errs.Error)
+	Create    func(userPayload *entity.User) (*dto.UserResponse, errs.Error)
 	Fetch     func(email string) (*entity.User, errs.Error)
-	Update    func(userPayload *entity.User) errs.Error
+	Update    func(userPayload *entity.User) (*dto.UserUpdateResponse, errs.Error)
 	FetchById func(userId int) (*entity.User, errs.Error)
 	Delete    func(userId int) errs.Error
 )
@@ -21,7 +22,7 @@ func NewUserRepositoryMock() UserRepository {
 }
 
 // Create implements UserRepository.
-func (urm *userRepositoryMock) Create(userPayload *entity.User) (int, errs.Error) {
+func (urm *userRepositoryMock) Create(userPayload *entity.User) (*dto.UserResponse, errs.Error) {
 	return Create(userPayload)
 }
 
@@ -31,7 +32,7 @@ func (urm *userRepositoryMock) Fetch(email string) (*entity.User, errs.Error) {
 }
 
 // Update implements UserRepository.
-func (urm *userRepositoryMock) Update(userPayload *entity.User) errs.Error {
+func (urm *userRepositoryMock) Update(userPayload *entity.User) (*dto.UserUpdateResponse, errs.Error) {
 	return Update((userPayload))
 }
 
