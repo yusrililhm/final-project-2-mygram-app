@@ -146,59 +146,7 @@ func TestPhotoService_UpdatePhoto_ServerError_Fail(t *testing.T) {
 	photoRepo := photo_repository.NewPhotoRepositoryMock()
 	photoService := photo_service.NewPhotoService(photoRepo)
 
-	photo_repository.UpdatePhoto = func(photoId int, photoPayload *entity.Photo) errs.Error {
-		return errs.NewInternalServerError("something went wrong")
-	}
-
-	response, err := photoService.UpdatePhoto(2, photoPayload)
-
-	assert.Nil(t, response)
-	assert.NotNil(t, err)
-	assert.Equal(t, http.StatusInternalServerError, err.Status())
-}
-
-func TestPhotoService_UpdatePhoto_GetPhotoNotFound_Fail(t *testing.T) {
-
-	photoPayload := &dto.NewPhotoRequest{
-		Title:    "momon",
-		PhotoUrl: "https://google.com",
-		Caption:  "lorem ipsum",
-	}
-
-	photoRepo := photo_repository.NewPhotoRepositoryMock()
-	photoService := photo_service.NewPhotoService(photoRepo)
-
-	photo_repository.UpdatePhoto = func(photoId int, photoPayload *entity.Photo) errs.Error {
-		return nil
-	}
-
-	photo_repository.GetPhotoId = func(photoId int) (*photo_repository.PhotoUserMapped, errs.Error) {
-		return nil, errs.NewNotFoundError("photo not found")
-	}
-
-	response, err := photoService.UpdatePhoto(2, photoPayload)
-
-	assert.Nil(t, response)
-	assert.NotNil(t, err)
-	assert.Equal(t, http.StatusNotFound, err.Status())
-}
-
-func TestPhotoService_UpdatePhoto_GetPhotoServerError_Fail(t *testing.T) {
-
-	photoPayload := &dto.NewPhotoRequest{
-		Title:    "momon",
-		PhotoUrl: "https://google.com",
-		Caption:  "lorem ipsum",
-	}
-
-	photoRepo := photo_repository.NewPhotoRepositoryMock()
-	photoService := photo_service.NewPhotoService(photoRepo)
-
-	photo_repository.UpdatePhoto = func(photoId int, photoPayload *entity.Photo) errs.Error {
-		return nil
-	}
-
-	photo_repository.GetPhotoId = func(photoId int) (*photo_repository.PhotoUserMapped, errs.Error) {
+	photo_repository.UpdatePhoto = func(photoId int, photoPayload *entity.Photo) (*dto.PhotoUpdateResponse, errs.Error) {
 		return nil, errs.NewInternalServerError("something went wrong")
 	}
 
@@ -220,8 +168,8 @@ func TestPhotoService_UpdatePhoto_Success(t *testing.T) {
 	photoRepo := photo_repository.NewPhotoRepositoryMock()
 	photoService := photo_service.NewPhotoService(photoRepo)
 
-	photo_repository.UpdatePhoto = func(photoId int, photoPayload *entity.Photo) errs.Error {
-		return nil
+	photo_repository.UpdatePhoto = func(photoId int, photoPayload *entity.Photo) (*dto.PhotoUpdateResponse, errs.Error) {
+		return &dto.PhotoUpdateResponse{}, nil
 	}
 
 	photo_repository.GetPhotoId = func(photoId int) (*photo_repository.PhotoUserMapped, errs.Error) {
