@@ -6,7 +6,6 @@ import (
 	"myGram/entity"
 	"myGram/pkg/errs"
 	"myGram/repository/comment_repository"
-	"time"
 )
 
 type commentRepositoryImpl struct {
@@ -29,7 +28,7 @@ const (
 					$3
 				)
 		RETURNING
-			id
+			id, message, photo_id, user_id, created_at
 	`
 )
 
@@ -48,8 +47,19 @@ func (commentRepo *commentRepositoryImpl) AddComment(commentPayload *entity.Comm
 		return nil, errs.NewInternalServerError("something went wrong " + err.Error())
 	}
 
-	var id int
-	err = tx.QueryRow(addCommentQuery, commentPayload.UserId, commentPayload.PhotoId, commentPayload.Message).Scan(&id)
+	var comment dto.NewCommentResponse
+	err = tx.QueryRow(
+		addCommentQuery,
+		commentPayload.UserId,
+		commentPayload.PhotoId,
+		commentPayload.Message,
+	).Scan(
+		&comment.Id,
+		&comment.Message,
+		&comment.PhotoId,
+		&comment.UserId,
+		&comment.CreatedAt,
+	)
 
 	if err != nil {
 		tx.Rollback()
@@ -61,11 +71,5 @@ func (commentRepo *commentRepositoryImpl) AddComment(commentPayload *entity.Comm
 		return nil, errs.NewInternalServerError("something went wrong " + err.Error())
 	}
 
-	return &dto.NewCommentResponse{
-		Id:        id,
-		UserId:    commentPayload.UserId,
-		PhotoId:   commentPayload.PhotoId,
-		Message:   commentPayload.Message,
-		CreatedAt: time.Now(),
-	}, nil
+	return &comment, nil
 }
