@@ -85,6 +85,13 @@ const (
 		WHERE
 			id = $1
 	`
+
+	deletePhotoById = `
+		DELETE FROM
+			photos
+		WHERE
+			id = $1		
+	`
 )
 
 func NewPhotoRepository(db *sql.DB) photo_repository.PhotoRepository {
@@ -212,6 +219,30 @@ func (photoRepo *photoRepositoryImpl) UpdatePhoto(photoId int, photoPayload *ent
 		return errs.NewInternalServerError("something went wrong")
 	}
 
+	if err := tx.Commit(); err != nil {
+		tx.Rollback()
+		return errs.NewInternalServerError("something went wrong")
+	}
+
+	return nil
+}
+
+// DeletePhoto implements photo_repository.PhotoRepository.
+func (photoRepo *photoRepositoryImpl) DeletePhoto(photoId int) errs.Error {
+	tx, err := photoRepo.db.Begin()
+
+	if err != nil {
+		tx.Rollback()
+		return errs.NewInternalServerError("something went wrong")
+	}
+
+	_, err = tx.Exec(deletePhotoById, photoId)
+
+	if err != nil {
+		tx.Rollback()
+		return errs.NewInternalServerError("something went wrong")
+	}
+	
 	if err := tx.Commit(); err != nil {
 		tx.Rollback()
 		return errs.NewInternalServerError("something went wrong")
