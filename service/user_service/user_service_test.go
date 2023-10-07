@@ -24,25 +24,15 @@ func TestUserService_Add_Success(t *testing.T) {
 	userRepo := user_repository.NewUserRepositoryMock()
 	userService := user_service.NewUserService(userRepo)
 
-	user_repository.Create = func(userPayload *entity.User) (int, errs.Error) {
-		return 1, nil
+	user_repository.Create = func(userPayload *entity.User) (*dto.UserResponse, errs.Error) {
+		return &dto.UserResponse{}, nil
 	}
 
 	response, err := userService.Add(userPayload)
-	expected := &dto.GetUserResponse{
-		StatusCode: http.StatusCreated,
-		Message:    "create new user successfully",
-		Data: dto.UserResponse{
-			Id:       1,
-			Username: "monday",
-			Email:    "monday.day@email.com",
-			Age:      21,
-		},
-	}
 
 	assert.NotNil(t, response)
 	assert.Nil(t, err)
-	assert.Equal(t, expected, response)
+	assert.Equal(t, http.StatusCreated, response.StatusCode)
 }
 
 func TestUserService_Add_Fail(t *testing.T) {
@@ -56,8 +46,8 @@ func TestUserService_Add_Fail(t *testing.T) {
 	userRepo := user_repository.NewUserRepositoryMock()
 	userService := user_service.NewUserService(userRepo)
 
-	user_repository.Create = func(userPayload *entity.User) (int, errs.Error) {
-		return 0, errs.NewInternalServerError("something went wrong")
+	user_repository.Create = func(userPayload *entity.User) (*dto.UserResponse, errs.Error) {
+		return nil, errs.NewInternalServerError("something went wrong")
 	}
 
 	response, err := userService.Add(userPayload)
@@ -76,10 +66,6 @@ func TestUserService_Add_PayloadNotValid_Fail(t *testing.T) {
 
 	userRepo := user_repository.NewUserRepositoryMock()
 	userService := user_service.NewUserService(userRepo)
-
-	user_repository.Create = func(userPayload *entity.User) (int, errs.Error) {
-		return 0, errs.NewInternalServerError("something went wrong")
-	}
 
 	response, err := userService.Add(userPayload)
 
@@ -185,199 +171,11 @@ func TestUserService_Get_PasswordNotValid_Fail(t *testing.T) {
 			Age:      21,
 			Password: "password rahasia here",
 		}
-		
+
 		return user, nil
 	}
 
 	response, err := userService.Get(userPayload)
-
-	assert.NotNil(t, err)
-	assert.Nil(t, response)
-}
-
-func TestUserService_Edit_Success(t *testing.T) {
-
-	userPayload := &dto.UserUpdateRequest{
-		Username: "monday",
-		Email:    "monday.day@weeekly.com",
-	}
-
-	userRepo := user_repository.NewUserRepositoryMock()
-	userService := user_service.NewUserService(userRepo)
-
-	user_repository.FetchById = func(userId int) (*entity.User, errs.Error) {
-		return &entity.User{
-			Id:        1,
-			Username:  "monday",
-			Email:     "monday.day@weeekly.com",
-			Password:  "rahasia",
-			Age:       21,
-			CreatedAt: time.Now(),
-			UpdatedAt: time.Now(),
-		}, nil
-	}
-
-	user_repository.Update = func(userPayload *entity.User) errs.Error {
-		return nil
-	}
-
-	response, err := userService.Edit(1, userPayload)
-
-	assert.Nil(t, err)
-	assert.NotNil(t, response)
-}
-
-func TestUserService_EditInvalidJson_Fail(t *testing.T) {
-
-	userPayload := &dto.UserUpdateRequest{
-		Username: "monday",
-		Email:    "monday.day",
-	}
-
-	userRepo := user_repository.NewUserRepositoryMock()
-	userService := user_service.NewUserService(userRepo)
-
-	response, err := userService.Edit(6, userPayload)
-
-	assert.NotNil(t, err)
-	assert.Nil(t, response)
-}
-
-func TestUserService_EditUserNotFound_Fail(t *testing.T) {
-
-	userPayload := &dto.UserUpdateRequest{
-		Username: "monday",
-		Email:    "monday.day@weeekly.com",
-	}
-
-	userRepo := user_repository.NewUserRepositoryMock()
-	userService := user_service.NewUserService(userRepo)
-
-	user_repository.FetchById = func(userId int) (*entity.User, errs.Error) {
-		return nil, errs.NewNotFoundError("user not found")
-	}
-
-	response, err := userService.Edit(1, userPayload)
-
-	assert.Nil(t, response)
-	assert.NotNil(t, err)
-}
-
-func TestUserService_EditRepo_Fail(t *testing.T) {
-
-	userPayload := &dto.UserUpdateRequest{
-		Username: "monday",
-		Email:    "monday.day@weeekly.com",
-	}
-
-	userRepo := user_repository.NewUserRepositoryMock()
-	userService := user_service.NewUserService(userRepo)
-
-	user_repository.FetchById = func(userId int) (*entity.User, errs.Error) {
-		return nil, errs.NewInternalServerError("something went wrong")
-	}
-
-	response, err := userService.Edit(1, userPayload)
-
-	assert.Nil(t, response)
-	assert.NotNil(t, err)
-}
-
-func TestUserService_EditUserIdNotValid_Fail(t *testing.T) {
-
-	userPayload := &dto.UserUpdateRequest{
-		Username: "monday",
-		Email:    "monday.day@weeekly.com",
-	}
-
-	userRepo := user_repository.NewUserRepositoryMock()
-	userService := user_service.NewUserService(userRepo)
-
-	user_repository.FetchById = func(userId int) (*entity.User, errs.Error) {
-		return &entity.User{
-			Id:        1,
-			Username:  "monday",
-			Email:     "monday.day@weeekly.com",
-			Password:  "rahasia",
-			Age:       21,
-			CreatedAt: time.Now(),
-			UpdatedAt: time.Now(),
-		}, nil
-	}
-
-	user_repository.Update = func(userPayload *entity.User) errs.Error {
-		return nil
-	}
-
-	response, err := userService.Edit(6, userPayload)
-
-	assert.NotNil(t, err)
-	assert.Nil(t, response)
-}
-
-func TestUserService_EditServer_Fail(t *testing.T) {
-
-	userPayload := &dto.UserUpdateRequest{
-		Username: "monday",
-		Email:    "monday.day@weeekly.com",
-	}
-
-	userRepo := user_repository.NewUserRepositoryMock()
-	userService := user_service.NewUserService(userRepo)
-
-	user_repository.FetchById = func(userId int) (*entity.User, errs.Error) {
-		return &entity.User{
-			Id:        1,
-			Username:  "monday",
-			Email:     "monday.day@weeekly.com",
-			Password:  "rahasia",
-			Age:       21,
-			CreatedAt: time.Now(),
-			UpdatedAt: time.Now(),
-		}, nil
-	}
-
-	user_repository.Update = func(userPayload *entity.User) errs.Error {
-		return errs.NewInternalServerError("something went wrong")
-	}
-
-	response, err := userService.Edit(1, userPayload)
-
-	assert.NotNil(t, err)
-	assert.Nil(t, response)
-}
-
-func TestUserService_EditGetResponse_Fail(t *testing.T) {
-
-	userPayload := &dto.UserUpdateRequest{
-		Username: "monday",
-		Email:    "monday.day@weeekly.com",
-	}
-
-	userRepo := user_repository.NewUserRepositoryMock()
-	userService := user_service.NewUserService(userRepo)
-
-	user_repository.FetchById = func(userId int) (*entity.User, errs.Error) {
-		return &entity.User{
-			Id:        6,
-			Username:  "monday",
-			Email:     "monday.day@weeekly.com",
-			Password:  "rahasia",
-			Age:       21,
-			CreatedAt: time.Now(),
-			UpdatedAt: time.Now(),
-		}, nil
-	}
-
-	user_repository.Update = func(userPayload *entity.User) errs.Error {
-		return nil
-	}
-
-	user_repository.FetchById = func(userId int) (*entity.User, errs.Error) {
-		return nil, errs.NewNotFoundError("user not found")
-	}
-
-	response, err := userService.Edit(1, userPayload)
 
 	assert.NotNil(t, err)
 	assert.Nil(t, response)
@@ -409,7 +207,7 @@ func TestUserService_Delete_Success(t *testing.T) {
 	assert.NotNil(t, response)
 }
 
-func TestUserService_DeleteUserNotFound_Fail(t *testing.T)  {
+func TestUserService_DeleteUserNotFound_Fail(t *testing.T) {
 	userRepo := user_repository.NewUserRepositoryMock()
 	userService := user_service.NewUserService(userRepo)
 
@@ -423,7 +221,7 @@ func TestUserService_DeleteUserNotFound_Fail(t *testing.T)  {
 	assert.Nil(t, response)
 }
 
-func TestUserService_DeleteUserServer_Fail(t *testing.T)  {
+func TestUserService_DeleteUserServer_Fail(t *testing.T) {
 	userRepo := user_repository.NewUserRepositoryMock()
 	userService := user_service.NewUserService(userRepo)
 
@@ -437,7 +235,7 @@ func TestUserService_DeleteUserServer_Fail(t *testing.T)  {
 	assert.Nil(t, response)
 }
 
-func TestUserService_DeleteUserIdNotValid_Fail(t *testing.T)  {
+func TestUserService_DeleteUserIdNotValid_Fail(t *testing.T) {
 	userRepo := user_repository.NewUserRepositoryMock()
 	userService := user_service.NewUserService(userRepo)
 
@@ -448,10 +246,10 @@ func TestUserService_DeleteUserIdNotValid_Fail(t *testing.T)  {
 	response, err := userService.Remove(1)
 
 	assert.NotNil(t, err)
-	assert.Nil(t, response)	
+	assert.Nil(t, response)
 }
 
-func TestUserService_DeleteUserServerError_Fail(t *testing.T)  {
+func TestUserService_DeleteUserServerError_Fail(t *testing.T) {
 	userRepo := user_repository.NewUserRepositoryMock()
 	userService := user_service.NewUserService(userRepo)
 
@@ -475,4 +273,149 @@ func TestUserService_DeleteUserServerError_Fail(t *testing.T)  {
 
 	assert.NotNil(t, err)
 	assert.Nil(t, response)
+}
+
+func TestUserService_Edit_InvalidBodyRequest_Fail(t *testing.T) {
+	userRepo := user_repository.NewUserRepositoryMock()
+	userService := user_service.NewUserService(userRepo)
+
+	userPaylod := &dto.UserUpdateRequest{}
+
+	response, err := userService.Edit(1, userPaylod)
+
+	assert.Nil(t, response)
+	assert.NotNil(t, err)
+	assert.Equal(t, http.StatusBadRequest, err.Status())
+}
+
+func TestUserService_Edit_GetUserNotFound_Fail(t *testing.T) {
+	userRepo := user_repository.NewUserRepositoryMock()
+	userService := user_service.NewUserService(userRepo)
+
+	userPaylod := &dto.UserUpdateRequest{
+		Username: "lorem",
+		Email:    "lorem@email.com",
+	}
+
+	user_repository.FetchById = func(userId int) (*entity.User, errs.Error) {
+		return nil, errs.NewNotFoundError("user not found")
+	}
+
+	response, err := userService.Edit(1, userPaylod)
+
+	assert.Nil(t, response)
+	assert.NotNil(t, err)
+	assert.Equal(t, http.StatusBadRequest, err.Status())
+}
+
+func TestUserService_Edit_GetUserServerError_Fail(t *testing.T) {
+	userRepo := user_repository.NewUserRepositoryMock()
+	userService := user_service.NewUserService(userRepo)
+
+	userPaylod := &dto.UserUpdateRequest{
+		Username: "lorem",
+		Email:    "lorem@email.com",
+	}
+
+	user_repository.FetchById = func(userId int) (*entity.User, errs.Error) {
+		return nil, errs.NewInternalServerError("something went wrong")
+	}
+
+	response, err := userService.Edit(1, userPaylod)
+
+	assert.Nil(t, response)
+	assert.NotNil(t, err)
+	assert.Equal(t, http.StatusInternalServerError, err.Status())
+}
+
+func TestUserService_Edit_InvalidUser_Fail(t *testing.T) {
+	userRepo := user_repository.NewUserRepositoryMock()
+	userService := user_service.NewUserService(userRepo)
+
+	userPaylod := &dto.UserUpdateRequest{
+		Username: "lorem",
+		Email:    "lorem@email.com",
+	}
+
+	user_repository.FetchById = func(userId int) (*entity.User, errs.Error) {
+		return &entity.User{
+			Id:        99,
+			Username:  "lorem",
+			Email:     "lorem@email.com",
+			Password:  "secret",
+			Age:       22,
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		}, nil
+	}
+
+	response, err := userService.Edit(1, userPaylod)
+
+	assert.Nil(t, response)
+	assert.NotNil(t, err)
+	assert.Equal(t, http.StatusNotFound, err.Status())
+}
+
+func TestUserService_Edit_UpdateUserServerError_Fail(t *testing.T) {
+	userRepo := user_repository.NewUserRepositoryMock()
+	userService := user_service.NewUserService(userRepo)
+
+	userPaylod := &dto.UserUpdateRequest{
+		Username: "lorem",
+		Email:    "lorem@email.com",
+	}
+
+	user_repository.FetchById = func(userId int) (*entity.User, errs.Error) {
+		return &entity.User{
+			Id:        1,
+			Username:  "lorem",
+			Email:     "lorem@email.com",
+			Password:  "secret",
+			Age:       22,
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		}, nil
+	}
+
+	user_repository.Update = func(userPayload *entity.User) (*dto.UserUpdateResponse, errs.Error) {
+		return nil, errs.NewInternalServerError("something went wrong")
+	}
+
+	response, err := userService.Edit(1, userPaylod)
+
+	assert.Nil(t, response)
+	assert.NotNil(t, err)
+	assert.Equal(t, http.StatusInternalServerError, err.Status())
+}
+
+func TestUserService_Edit_Success(t *testing.T) {
+	userRepo := user_repository.NewUserRepositoryMock()
+	userService := user_service.NewUserService(userRepo)
+
+	userPaylod := &dto.UserUpdateRequest{
+		Username: "lorem",
+		Email:    "lorem@email.com",
+	}
+
+	user_repository.FetchById = func(userId int) (*entity.User, errs.Error) {
+		return &entity.User{
+			Id:        1,
+			Username:  "lorem",
+			Email:     "lorem@email.com",
+			Password:  "secret",
+			Age:       22,
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		}, nil
+	}
+
+	user_repository.Update = func(userPayload *entity.User) (*dto.UserUpdateResponse, errs.Error) {
+		return &dto.UserUpdateResponse{}, nil
+	}
+
+	response, err := userService.Edit(1, userPaylod)
+
+	assert.Nil(t, err)
+	assert.NotNil(t, response)
+	assert.Equal(t, http.StatusOK, response.StatusCode)
 }
