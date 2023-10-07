@@ -50,7 +50,16 @@ func (photoHandler *photoHandlerImpl) AddPhoto(ctx *gin.Context) {
 
 // DeletePhoto implements PhotoHandler.
 func (photoHandler *photoHandlerImpl) DeletePhoto(ctx *gin.Context) {
+	photoId, _ := strconv.Atoi(ctx.Param("photoId"))
 
+	response, err := photoHandler.ps.DeletePhoto(photoId)
+
+	if err != nil {
+		ctx.AbortWithStatusJSON(err.Status(), err)
+		return
+	}
+
+	ctx.JSON(response.StatusCode, response)
 }
 
 // GetPhotos implements PhotoHandler.
@@ -68,7 +77,6 @@ func (photoHandler *photoHandlerImpl) GetPhotos(ctx *gin.Context) {
 // UpdatePhoto implements PhotoHandler.
 func (photoHandler *photoHandlerImpl) UpdatePhoto(ctx *gin.Context) {
 	photoId, _ := strconv.Atoi(ctx.Param("photoId"))
-	_ = photoId
 
 	photoPayload := &dto.NewPhotoRequest{}
 
