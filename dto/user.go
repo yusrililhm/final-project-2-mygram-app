@@ -39,7 +39,7 @@ type TokenResponse struct {
 }
 
 type GetUserResponse struct {
-	StatusCode int    `json:"statusCode"`
+	StatusCode int    `json:"status_code"`
 	Message    string `json:"message"`
 	Data       any    `json:"data"`
 }
