@@ -11,6 +11,7 @@ var (
 	GetPhotos   func() ([]PhotoUserMapped, errs.Error)
 	GetPhotoId  func(photoId int) (*PhotoUserMapped, errs.Error)
 	UpdatePhoto func(photoId int, photoPayload *entity.Photo) errs.Error
+	DeletePhoto func(photoId int) errs.Error
 )
 
 type photoRepositoryMock struct {
@@ -38,4 +39,9 @@ func (prm *photoRepositoryMock) GetPhotoId(photoId int) (*PhotoUserMapped, errs.
 // UpdatePhoto implements PhotoRepository.
 func (prm *photoRepositoryMock) UpdatePhoto(photoId int, photoPayload *entity.Photo) errs.Error {
 	return UpdatePhoto(photoId, photoPayload)
+}
+
+// DeletePhoto implements PhotoRepository.
+func (prm *photoRepositoryMock) DeletePhoto(photoId int) errs.Error {
+	return DeletePhoto(photoId)
 }
