@@ -10,7 +10,7 @@ var (
 	AddPhoto    func(photoPayload *entity.Photo) (*dto.PhotoResponse, errs.Error)
 	GetPhotos   func() ([]PhotoUserMapped, errs.Error)
 	GetPhotoId  func(photoId int) (*PhotoUserMapped, errs.Error)
-	UpdatePhoto func(photoId int, photoPayload *entity.Photo) errs.Error
+	UpdatePhoto func(photoId int, photoPayload *entity.Photo) (*dto.PhotoUpdateResponse, errs.Error)
 	DeletePhoto func(photoId int) errs.Error
 )
 
@@ -37,7 +37,7 @@ func (prm *photoRepositoryMock) GetPhotoId(photoId int) (*PhotoUserMapped, errs.
 }
 
 // UpdatePhoto implements PhotoRepository.
-func (prm *photoRepositoryMock) UpdatePhoto(photoId int, photoPayload *entity.Photo) errs.Error {
+func (prm *photoRepositoryMock) UpdatePhoto(photoId int, photoPayload *entity.Photo) (*dto.PhotoUpdateResponse, errs.Error) {
 	return UpdatePhoto(photoId, photoPayload)
 }
 
