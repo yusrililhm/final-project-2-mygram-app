@@ -44,7 +44,7 @@ func (userService *userServiceImpl) Add(userPayload *dto.NewUserRequest) (*dto.G
 
 	user.HashPassword()
 
-	id, err := userService.userRepo.Create(user)
+	response, err := userService.userRepo.Create(user)
 
 	if err != nil {
 		return nil, err
@@ -53,12 +53,7 @@ func (userService *userServiceImpl) Add(userPayload *dto.NewUserRequest) (*dto.G
 	return &dto.GetUserResponse{
 		StatusCode: http.StatusCreated,
 		Message:    "create new user successfully",
-		Data: dto.UserResponse{
-			Id:       id,
-			Username: user.Username,
-			Email:    user.Email,
-			Age:      user.Age,
-		},
+		Data:       response,
 	}, nil
 }
 
@@ -124,24 +119,17 @@ func (userService *userServiceImpl) Edit(userId int, userPayload *dto.UserUpdate
 		Email:    userPayload.Email,
 		Username: userPayload.Username,
 	}
-	err = userService.userRepo.Update(usr)
+
+	response, err := userService.userRepo.Update(usr)
 
 	if err != nil {
 		return nil, err
 	}
 
-	user, err = userService.userRepo.FetchById(userId)
-
 	return &dto.GetUserResponse{
 		StatusCode: http.StatusOK,
 		Message:    "user updated successfully",
-		Data: dto.UserUpdateResponse{
-			Id:        user.Id,
-			Username:  user.Username,
-			Email:     user.Email,
-			Age:       user.Age,
-			UpdatedAt: user.UpdatedAt,
-		},
+		Data:       response,
 	}, nil
 }
 
