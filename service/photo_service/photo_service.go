@@ -89,32 +89,16 @@ func (photoService *photoServiceImpl) UpdatePhoto(photoId int, photoPayload *dto
 		PhotoUrl: photoPayload.PhotoUrl,
 	}
 
-	err = photoService.pr.UpdatePhoto(photoId, photo)
+	response, err := photoService.pr.UpdatePhoto(photoId, photo)
 
 	if err != nil {
-		return nil, err
-	}
-
-	response, err := photoService.pr.GetPhotoId(photoId)
-
-	if err != nil {
-		if err.Status() == http.StatusNotFound {
-			return nil, err
-		}
 		return nil, err
 	}
 
 	return &dto.GetPhotoResponse{
 		StatusCode: http.StatusOK,
 		Message:    "photo successfully updated",
-		Data: dto.PhotoUpdateResponse{
-			Id:        response.Id,
-			Title:     response.Title,
-			Caption:   response.Caption,
-			PhotoUrl:  response.PhotoUrl,
-			UserId:    response.UserId,
-			UpdatedAt: response.UpdatedAt,
-		},
+		Data:       response,
 	}, nil
 }
 
