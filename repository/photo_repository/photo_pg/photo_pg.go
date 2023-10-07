@@ -6,7 +6,6 @@ import (
 	"myGram/entity"
 	"myGram/pkg/errs"
 	"myGram/repository/photo_repository"
-	"time"
 )
 
 type photoRepositoryImpl struct {
@@ -26,7 +25,7 @@ const (
 		VALUES
 				($2, $3, $4, $1)
 		RETURNING
-				id
+				id, title, caption, photo_url, user_id, created_at
 	`
 
 	getUserAndPhotos = `
@@ -84,6 +83,8 @@ const (
 			updated_at = now()
 		WHERE
 			id = $1
+		RETURNING
+				id, title, caption, photo_url, user_id, updated_at
 	`
 
 	deletePhotoById = `
@@ -110,10 +111,17 @@ func (photoRepo *photoRepositoryImpl) AddPhoto(photoPayload *entity.Photo) (*dto
 		return nil, errs.NewInternalServerError("something went wrong " + err.Error())
 	}
 
-	var id int
 	row := tx.QueryRow(addNewPhotoQuery, photoPayload.UserId, photoPayload.Title, photoPayload.Caption, photoPayload.PhotoUrl)
+	var photo dto.PhotoResponse
 
-	err = row.Scan(&id)
+	err = row.Scan(
+		&photo.Id,
+		&photo.Title,
+		&photo.Caption,
+		&photo.PhotoUrl,
+		&photo.UserId,
+		&photo.CreatedAt,
+	)
 
 	if err != nil {
 		tx.Rollback()
@@ -125,14 +133,7 @@ func (photoRepo *photoRepositoryImpl) AddPhoto(photoPayload *entity.Photo) (*dto
 		return nil, errs.NewInternalServerError("something went wrong " + err.Error())
 	}
 
-	return &dto.PhotoResponse{
-		Id:        id,
-		Title:     photoPayload.Title,
-		Caption:   photoPayload.Caption,
-		PhotoUrl:  photoPayload.PhotoUrl,
-		UserId:    photoPayload.UserId,
-		CreatedAt: time.Now(),
-	}, nil
+	return &photo, nil
 }
 
 // GetPhotos implements photo_repository.PhotoRepository.
@@ -204,27 +205,38 @@ func (photoRepo *photoRepositoryImpl) GetPhotoId(photoId int) (*photo_repository
 }
 
 // UpdatePhoto implements photo_repository.PhotoRepository.
-func (photoRepo *photoRepositoryImpl) UpdatePhoto(photoId int, photoPayload *entity.Photo) errs.Error {
+func (photoRepo *photoRepositoryImpl) UpdatePhoto(photoId int, photoPayload *entity.Photo) (*dto.PhotoUpdateResponse, errs.Error) {
 	tx, err := photoRepo.db.Begin()
 
 	if err != nil {
 		tx.Rollback()
-		return errs.NewInternalServerError("something went wrong")
+		return nil, errs.NewInternalServerError("something went wrong")
 	}
 
-	_, err = tx.Exec(UpdatePhotoQuery, photoId, photoPayload.Title, photoPayload.Caption, photoPayload.PhotoUrl)
+	row := tx.QueryRow(UpdatePhotoQuery, photoId, photoPayload.Title, photoPayload.Caption, photoPayload.PhotoUrl)
+
+	var photo dto.PhotoUpdateResponse
+
+	err = row.Scan(
+		&photo.Id,
+		&photo.Title,
+		&photo.Caption,
+		&photo.PhotoUrl,
+		&photo.UserId,
+		&photo.UpdatedAt,
+	)
 
 	if err != nil {
 		tx.Rollback()
-		return errs.NewInternalServerError("something went wrong")
+		return nil, errs.NewInternalServerError("something went wrong")
 	}
 
 	if err := tx.Commit(); err != nil {
 		tx.Rollback()
-		return errs.NewInternalServerError("something went wrong")
+		return nil, errs.NewInternalServerError("something went wrong")
 	}
 
-	return nil
+	return &photo, nil
 }
 
 // DeletePhoto implements photo_repository.PhotoRepository.
@@ -242,7 +254,7 @@ func (photoRepo *photoRepositoryImpl) DeletePhoto(photoId int) errs.Error {
 		tx.Rollback()
 		return errs.NewInternalServerError("something went wrong")
 	}
-	
+
 	if err := tx.Commit(); err != nil {
 		tx.Rollback()
 		return errs.NewInternalServerError("something went wrong")
