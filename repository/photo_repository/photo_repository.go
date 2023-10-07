@@ -11,4 +11,5 @@ type PhotoRepository interface {
 	GetPhotos() ([]PhotoUserMapped, errs.Error)
 	GetPhotoId(photoId int) (*PhotoUserMapped, errs.Error)
 	UpdatePhoto(photoId int, photoPayload *entity.Photo) errs.Error
+	DeletePhoto(photoId int) errs.Error
 }
