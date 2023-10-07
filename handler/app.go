@@ -3,9 +3,11 @@ package handler
 import (
 	"myGram/infra/config"
 	"myGram/infra/database"
+	"myGram/repository/comment_repository/comment_pg"
 	"myGram/repository/photo_repository/photo_pg"
 	"myGram/repository/user_repository/user_pg"
 	"myGram/service/auth_service"
+	"myGram/service/comment_service"
 	"myGram/service/photo_service"
 	"myGram/service/user_service"
 
@@ -27,6 +29,10 @@ func StartApplication() {
 	photoRepository := photo_pg.NewPhotoRepository(db)
 	photoService := photo_service.NewPhotoService(photoRepository)
 	photoHandler := NewPhotoHandler(photoService)
+
+	commentRepo := comment_pg.NewCommentRepository(db)
+	commentService := comment_service.NewCommentService(commentRepo, photoRepository)
+	commentHandler := NewCommentHandler(commentService)
 
 	authService := auth_service.NewAuthService(userRepo, photoRepository)
 
@@ -51,6 +57,15 @@ func StartApplication() {
 		photos.GET("", authService.Authentication(), photoHandler.GetPhotos)
 		photos.PUT("/:photoId", authService.Authentication(), authService.AuthorizationPhoto(), photoHandler.UpdatePhoto)
 		photos.DELETE("/:photoId", authService.Authentication(), authService.AuthorizationPhoto(), photoHandler.DeletePhoto)
+	}
+
+	comments := app.Group("comments")
+
+	{
+		comments.POST("", authService.Authentication(), commentHandler.AddComment)
+		comments.GET("", authService.Authentication())
+		comments.PUT("/:commentId", authService.Authentication())
+		comments.DELETE("/:commentId", authService.Authentication())
 	}
 
 	app.Run(":" + config.AppConfig().Port)
