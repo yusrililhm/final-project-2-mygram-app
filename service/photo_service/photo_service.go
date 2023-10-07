@@ -13,6 +13,7 @@ type PhotoService interface {
 	AddPhoto(userId int, photoPayload *dto.NewPhotoRequest) (*dto.GetPhotoResponse, errs.Error)
 	GetPhotos() (*dto.GetPhotoResponse, errs.Error)
 	UpdatePhoto(photoId int, photoPayload *dto.NewPhotoRequest) (*dto.GetPhotoResponse, errs.Error)
+	DeletePhoto(photoId int) (*dto.GetPhotoResponse, errs.Error)
 }
 
 type photoServiceImpl struct {
@@ -114,5 +115,21 @@ func (photoService *photoServiceImpl) UpdatePhoto(photoId int, photoPayload *dto
 			UserId:    response.UserId,
 			UpdatedAt: response.UpdatedAt,
 		},
+	}, nil
+}
+
+// DeletePhoto implements PhotoService.
+func (photoService *photoServiceImpl) DeletePhoto(photoId int) (*dto.GetPhotoResponse, errs.Error) {
+
+	err := photoService.pr.DeletePhoto(photoId)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &dto.GetPhotoResponse{
+		StatusCode: http.StatusOK,
+		Message:    "Your photo has been successfully deleted",
+		Data:       nil,
 	}, nil
 }
