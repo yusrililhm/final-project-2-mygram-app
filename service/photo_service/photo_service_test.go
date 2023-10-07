@@ -234,3 +234,33 @@ func TestPhotoService_UpdatePhoto_Success(t *testing.T) {
 	assert.NotNil(t, response)
 	assert.Equal(t, http.StatusOK, response.StatusCode)
 }
+
+func TestPhotoService_DeletePhoto_ServerError_Fail(t *testing.T)  {
+	photoRepo := photo_repository.NewPhotoRepositoryMock()
+	photoService := photo_service.NewPhotoService(photoRepo)
+
+	photo_repository.DeletePhoto = func(photoId int) errs.Error {
+		return errs.NewInternalServerError("something went wrong")
+	}
+
+	response, err := photoService.DeletePhoto(1)
+
+	assert.Nil(t, response)
+	assert.NotNil(t, err)
+	assert.Equal(t, http.StatusInternalServerError, err.Status())
+}
+
+func TestPhotoService_DeletePhoto_Success(t *testing.T)  {
+	photoRepo := photo_repository.NewPhotoRepositoryMock()
+	photoService := photo_service.NewPhotoService(photoRepo)
+
+	photo_repository.DeletePhoto = func(photoId int) errs.Error {
+		return nil
+	}
+
+	response, err := photoService.DeletePhoto(1)
+
+	assert.Nil(t, err)
+	assert.NotNil(t, response)
+	assert.Equal(t, "Your photo has been successfully deleted", response.Message)
+}
