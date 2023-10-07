@@ -2,6 +2,7 @@ package user_pg
 
 import (
 	"database/sql"
+	"myGram/dto"
 	"myGram/entity"
 	"myGram/pkg/errs"
 	"myGram/repository/user_repository"
@@ -17,7 +18,8 @@ const (
 			users (username, email, age, password)
 		VALUES
 			($1, $2, $3, $4)
-		RETURNING id
+		RETURNING
+			id, username, email, age
 	`
 
 	fetchUserByEmail = `
@@ -59,6 +61,8 @@ const (
 			updated_at = now()
 		WHERE
 			id = $1
+		RETURNING
+			id, username, email, age, updated_at
 	`
 
 	deleteUserQuery = `
@@ -77,28 +81,39 @@ func NewUserRepository(db *sql.DB) user_repository.UserRepository {
 }
 
 // Create implements user_repository.UserRepository.
-func (userRepo *userRepositoryImpl) Create(userPayload *entity.User) (int, errs.Error) {
-	var id int
+func (userRepo *userRepositoryImpl) Create(userPayload *entity.User) (*dto.UserResponse, errs.Error) {
 	tx, err := userRepo.db.Begin()
 
 	if err != nil {
 		tx.Rollback()
-		return 0, errs.NewInternalServerError("something went wrong")
+		return nil, errs.NewInternalServerError("something went wrong")
 	}
 
-	err = tx.QueryRow(createUserQuery, userPayload.Username, userPayload.Email, userPayload.Age, userPayload.Password).Scan(&id)
+	var user dto.UserResponse
+	err = tx.QueryRow(
+			createUserQuery, 
+			userPayload.Username, 
+			userPayload.Email, 
+			userPayload.Age, 
+			userPayload.Password,
+	).Scan(
+			&user.Id, 
+			&user.Username, 
+			&user.Email, 
+			&user.Age,
+	)
 
 	if err != nil {
 		tx.Rollback()
-		return 0, errs.NewInternalServerError("something went wrong")
+		return nil, errs.NewInternalServerError("something went wrong")
 	}
 
 	if err := tx.Commit(); err != nil {
 		tx.Rollback()
-		return 0, errs.NewInternalServerError("something went wrong")
+		return nil, errs.NewInternalServerError("something went wrong")
 	}
 
-	return id, nil
+	return &user, nil
 }
 
 // Fetch implements user_repository.UserRepository.
@@ -126,28 +141,37 @@ func (userRepo *userRepositoryImpl) Fetch(email string) (*entity.User, errs.Erro
 }
 
 // Update implements user_repository.UserRepository.
-func (userRepo *userRepositoryImpl) Update(userPayload *entity.User) errs.Error {
+func (userRepo *userRepositoryImpl) Update(userPayload *entity.User) (*dto.UserUpdateResponse, errs.Error) {
 
 	tx, err := userRepo.db.Begin()
 
 	if err != nil {
 		tx.Rollback()
-		return errs.NewInternalServerError("something went wrong " + err.Error())
+		return nil, errs.NewInternalServerError("something went wrong " + err.Error())
 	}
 
-	_, err = tx.Exec(updateUserQuery, userPayload.Id, userPayload.Username, userPayload.Email)
+	row := tx.QueryRow(updateUserQuery, userPayload.Id, userPayload.Username, userPayload.Email)
+
+	var user dto.UserUpdateResponse
+	err = row.Scan(
+		&user.Id,
+		&user.Email,
+		&user.Username,
+		&user.Age,
+		&user.UpdatedAt,
+	)
 
 	if err != nil {
 		tx.Rollback()
-		return errs.NewInternalServerError("something went wrong" + err.Error())
+		return nil, errs.NewInternalServerError("something went wrong" + err.Error())
 	}
 
 	if err := tx.Commit(); err != nil {
 		tx.Rollback()
-		return errs.NewInternalServerError("something went wrong" + err.Error())
+		return nil, errs.NewInternalServerError("something went wrong" + err.Error())
 	}
 
-	return nil
+	return &user, nil
 }
 
 // FetchById implements user_repository.UserRepository.
