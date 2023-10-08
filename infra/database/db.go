@@ -84,7 +84,9 @@ func handleRequiredTables() {
 						id SERIAL PRIMARY KEY,
 						name VARCHAR(50) NOT NULL,
 						social_media_url TEXT NOT NULL,
-						user_id INT,
+						user_id INT NOT NIL,
+						created_at TIMESTAMPTZ DEFAULT now(),
+						updated_at TIMESTAMPTZ DEFAULT now(),
 						CONSTRAINT
 							fk_social_media_user_id
 								FOREIGN KEY(user_id)
