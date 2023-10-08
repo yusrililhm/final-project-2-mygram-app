@@ -10,7 +10,8 @@ type commentRepositoryMock struct {
 }
 
 var (
-	AddComment func(commentPayload *entity.Comment) (*dto.NewCommentResponse, errs.Error)
+	AddComment  func(commentPayload *entity.Comment) (*dto.NewCommentResponse, errs.Error)
+	GetComments func() ([]CommentUserPhotoMapped, errs.Error)
 )
 
 func NewCommentRepositoryMock() CommentRepository {
@@ -20,4 +21,9 @@ func NewCommentRepositoryMock() CommentRepository {
 // AddComment implements CommentRepository.
 func (crm *commentRepositoryMock) AddComment(commentPayload *entity.Comment) (*dto.NewCommentResponse, errs.Error) {
 	return AddComment(commentPayload)
+}
+
+// GetComments implements CommentRepository.
+func (crm *commentRepositoryMock) GetComments() ([]CommentUserPhotoMapped, errs.Error) {
+	return GetComments()
 }
