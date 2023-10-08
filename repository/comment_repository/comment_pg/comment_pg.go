@@ -60,6 +60,34 @@ const (
 			c.id
 		ASC
 	`
+
+	getCommentByIdQuery = `
+		SELECT 
+			c.id,
+			c.user_id,
+			c.photo_id,
+			c.message,
+			c.created_at,
+			c.updated_at,
+			u.id,
+			u.username,
+			u.email,
+			p.id,
+			p.caption,
+			p.photo_url,
+			p.user_id
+		FROM 
+			comments AS c
+		LEFT JOIN
+			users AS u
+		ON
+			c.user_id = u.id
+		LEFT JOIN
+			photos AS p
+		ON
+			c.photo_id = p.id
+		WHERE c.id = $1
+	`
 )
 
 func NewCommentRepository(db *sql.DB) comment_repository.CommentRepository {
@@ -140,5 +168,38 @@ func (commentRepo *commentRepositoryImpl) GetComments() ([]comment_repository.Co
 	}
 
 	result := comment_repository.CommentUserPhotoMapped{}
-	return result.HandleMappingCommentUserPhoto(commentsUserPhoto), nil
+	return result.HandleMappingCommentsUserPhoto(commentsUserPhoto), nil
+}
+
+// GetCommentById implements comment_repository.CommentRepository.
+func (commentRepo *commentRepositoryImpl) GetCommentById(commentId int) (*comment_repository.CommentUserPhotoMapped, errs.Error) {
+
+	var commentUserPhoto comment_repository.CommentUserPhoto
+	rows := commentRepo.db.QueryRow(getCommentByIdQuery, commentId)
+
+	err := rows.Scan(
+		&commentUserPhoto.Comment.Id,
+		&commentUserPhoto.Comment.UserId,
+		&commentUserPhoto.Comment.PhotoId,
+		&commentUserPhoto.Comment.Message,
+		&commentUserPhoto.Comment.CreatedAt,
+		&commentUserPhoto.Comment.UpdatedAt,
+		&commentUserPhoto.User.Id,
+		&commentUserPhoto.User.Username,
+		&commentUserPhoto.User.Email,
+		&commentUserPhoto.Photo.Id,
+		&commentUserPhoto.Photo.Caption,
+		&commentUserPhoto.Photo.PhotoUrl,
+		&commentUserPhoto.Photo.UserId,
+	)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errs.NewNotFoundError("comment not found")
+		}
+		return nil, errs.NewInternalServerError("something went wrong " + err.Error())
+	}
+
+	result := comment_repository.CommentUserPhotoMapped{}
+	return result.HandleMappingCommentUserPhoto(commentUserPhoto), nil
 }

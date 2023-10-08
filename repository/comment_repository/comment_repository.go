@@ -9,4 +9,5 @@ import (
 type CommentRepository interface {
 	AddComment(commentPayload *entity.Comment) (*dto.NewCommentResponse, errs.Error)
 	GetComments() ([]CommentUserPhotoMapped, errs.Error)
+	GetCommentById(commentId int) (*CommentUserPhotoMapped, errs.Error)
 }
