@@ -69,7 +69,7 @@ func (photoService *photoServiceImpl) GetPhotos() (*dto.GetPhotoResponse, errs.E
 
 	return &dto.GetPhotoResponse{
 		StatusCode: http.StatusOK,
-		Message:    "fetch photos successfully",
+		Message:    "photos successfully fetched",
 		Data:       result,
 	}, nil
 }
