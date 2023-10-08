@@ -5,6 +5,7 @@ import (
 	"myGram/entity"
 	"myGram/pkg/errs"
 	"myGram/service/comment_service"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -49,7 +50,16 @@ func (commentHandler *commentHandlerImpl) AddComment(ctx *gin.Context) {
 
 // DeleteComment implements CommentHandler.
 func (commentHandler *commentHandlerImpl) DeleteComment(ctx *gin.Context) {
-	panic("unimplemented")
+	commentId, _ := strconv.Atoi(ctx.Param("commentId"))
+
+	response, err := commentHandler.commentService.DeleteComment(commentId)
+
+	if err != nil {
+		ctx.AbortWithStatusJSON(err.Status(), err)
+		return
+	}
+
+	ctx.JSON(response.StatusCode, response)
 }
 
 // GetComments implements CommentHandler.
