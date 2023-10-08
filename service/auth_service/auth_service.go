@@ -18,21 +18,21 @@ type AuthService interface {
 }
 
 type authServiceImpl struct {
-	userRepository    user_repository.UserRepository
-	photoRepository   photo_repository.PhotoRepository
-	commentRepository comment_repository.CommentRepository
+	ur user_repository.UserRepository
+	pr photo_repository.PhotoRepository
+	cr comment_repository.CommentRepository
 }
 
 func NewAuthService(userRepo user_repository.UserRepository, photoRepo photo_repository.PhotoRepository, commentRepo comment_repository.CommentRepository) AuthService {
 	return &authServiceImpl{
-		userRepository:    userRepo,
-		photoRepository:   photoRepo,
-		commentRepository: commentRepo,
+		ur: userRepo,
+		pr: photoRepo,
+		cr: commentRepo,
 	}
 }
 
-// Authentication implements AuthService.
-func (authService *authServiceImpl) Authentication() gin.HandlerFunc {
+// Authentication implements a.
+func (a *authServiceImpl) Authentication() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
 		invalidToken := errs.NewUnauthenticatedError("invalid token")
@@ -47,7 +47,7 @@ func (authService *authServiceImpl) Authentication() gin.HandlerFunc {
 			return
 		}
 
-		_, err = authService.userRepository.FetchById(user.Id)
+		_, err = a.ur.FetchById(user.Id)
 
 		if err != nil {
 			ctx.AbortWithStatusJSON(invalidToken.Status(), invalidToken)
@@ -59,14 +59,14 @@ func (authService *authServiceImpl) Authentication() gin.HandlerFunc {
 	}
 }
 
-// AuthorizationPhoto implements AuthService.
-func (authService *authServiceImpl) AuthorizationPhoto() gin.HandlerFunc {
+// AuthorizationPhoto implements a.
+func (a *authServiceImpl) AuthorizationPhoto() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		user := ctx.MustGet("userData").(entity.User)
 
 		photoId, _ := strconv.Atoi(ctx.Param("photoId"))
 
-		photo, err := authService.photoRepository.GetPhotoId(photoId)
+		photo, err := a.pr.GetPhotoId(photoId)
 
 		if err != nil {
 			ctx.AbortWithStatusJSON(err.Status(), err)
@@ -82,15 +82,15 @@ func (authService *authServiceImpl) AuthorizationPhoto() gin.HandlerFunc {
 	}
 }
 
-// AuthorizationComment implements AuthService.
-func (authService *authServiceImpl) AuthorizationComment() gin.HandlerFunc {
+// AuthorizationComment implements a.
+func (a *authServiceImpl) AuthorizationComment() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
 		user := ctx.MustGet("userData").(entity.User)
 
 		commentId, _ := strconv.Atoi(ctx.Param("commentId"))
 
-		comment, err := authService.commentRepository.GetCommentById(commentId)
+		comment, err := a.cr.GetCommentById(commentId)
 
 		if err != nil {
 			ctx.AbortWithStatusJSON(err.Status(), err)

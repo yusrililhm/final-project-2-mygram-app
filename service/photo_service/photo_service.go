@@ -27,7 +27,7 @@ func NewPhotoService(photoRepository photo_repository.PhotoRepository) PhotoServ
 }
 
 // AddPhoto implements PhotoService.
-func (photoService *photoServiceImpl) AddPhoto(userId int, photoPayload *dto.NewPhotoRequest) (*dto.GetPhotoResponse, errs.Error) {
+func (p *photoServiceImpl) AddPhoto(userId int, photoPayload *dto.NewPhotoRequest) (*dto.GetPhotoResponse, errs.Error) {
 
 	err := helper.ValidateStruct(photoPayload)
 
@@ -42,7 +42,7 @@ func (photoService *photoServiceImpl) AddPhoto(userId int, photoPayload *dto.New
 		UserId:   userId,
 	}
 
-	response, err := photoService.pr.AddPhoto(photo)
+	response, err := p.pr.AddPhoto(photo)
 
 	if err != nil {
 		return nil, err
@@ -56,9 +56,9 @@ func (photoService *photoServiceImpl) AddPhoto(userId int, photoPayload *dto.New
 }
 
 // GetPhotos implements PhotoService.
-func (photoService *photoServiceImpl) GetPhotos() (*dto.GetPhotoResponse, errs.Error) {
+func (p *photoServiceImpl) GetPhotos() (*dto.GetPhotoResponse, errs.Error) {
 
-	result, err := photoService.pr.GetPhotos()
+	result, err := p.pr.GetPhotos()
 
 	if err != nil {
 		if err.Status() == http.StatusNotFound {
@@ -75,7 +75,7 @@ func (photoService *photoServiceImpl) GetPhotos() (*dto.GetPhotoResponse, errs.E
 }
 
 // UpdatePhoto implements PhotoService.
-func (photoService *photoServiceImpl) UpdatePhoto(photoId int, photoPayload *dto.NewPhotoRequest) (*dto.GetPhotoResponse, errs.Error) {
+func (p *photoServiceImpl) UpdatePhoto(photoId int, photoPayload *dto.NewPhotoRequest) (*dto.GetPhotoResponse, errs.Error) {
 
 	err := helper.ValidateStruct(photoPayload)
 
@@ -89,7 +89,7 @@ func (photoService *photoServiceImpl) UpdatePhoto(photoId int, photoPayload *dto
 		PhotoUrl: photoPayload.PhotoUrl,
 	}
 
-	response, err := photoService.pr.UpdatePhoto(photoId, photo)
+	response, err := p.pr.UpdatePhoto(photoId, photo)
 
 	if err != nil {
 		return nil, err
@@ -103,9 +103,9 @@ func (photoService *photoServiceImpl) UpdatePhoto(photoId int, photoPayload *dto
 }
 
 // DeletePhoto implements PhotoService.
-func (photoService *photoServiceImpl) DeletePhoto(photoId int) (*dto.GetPhotoResponse, errs.Error) {
+func (p *photoServiceImpl) DeletePhoto(photoId int) (*dto.GetPhotoResponse, errs.Error) {
 
-	err := photoService.pr.DeletePhoto(photoId)
+	err := p.pr.DeletePhoto(photoId)
 
 	if err != nil {
 		return nil, err

@@ -17,17 +17,17 @@ type UserService interface {
 }
 
 type userServiceImpl struct {
-	userRepo user_repository.UserRepository
+	ur user_repository.UserRepository
 }
 
 func NewUserService(userRepo user_repository.UserRepository) UserService {
 	return &userServiceImpl{
-		userRepo: userRepo,
+		ur: userRepo,
 	}
 }
 
 // Add implements UserService.
-func (userService *userServiceImpl) Add(userPayload *dto.NewUserRequest) (*dto.GetUserResponse, errs.Error) {
+func (u *userServiceImpl) Add(userPayload *dto.NewUserRequest) (*dto.GetUserResponse, errs.Error) {
 
 	err := helper.ValidateStruct(userPayload)
 
@@ -44,7 +44,7 @@ func (userService *userServiceImpl) Add(userPayload *dto.NewUserRequest) (*dto.G
 
 	user.HashPassword()
 
-	response, err := userService.userRepo.Create(user)
+	response, err := u.ur.Create(user)
 
 	if err != nil {
 		return nil, err
@@ -66,7 +66,7 @@ func (us *userServiceImpl) Get(userPayload *dto.UserLoginRequest) (*dto.GetUserR
 		return nil, err
 	}
 
-	user, err := us.userRepo.Fetch(userPayload.Email)
+	user, err := us.ur.Fetch(userPayload.Email)
 
 	if err != nil {
 		if err.Status() == http.StatusNotFound {
@@ -93,7 +93,7 @@ func (us *userServiceImpl) Get(userPayload *dto.UserLoginRequest) (*dto.GetUserR
 }
 
 // Edit implements UserService.
-func (userService *userServiceImpl) Edit(userId int, userPayload *dto.UserUpdateRequest) (*dto.GetUserResponse, errs.Error) {
+func (u *userServiceImpl) Edit(userId int, userPayload *dto.UserUpdateRequest) (*dto.GetUserResponse, errs.Error) {
 
 	err := helper.ValidateStruct(userPayload)
 
@@ -101,7 +101,7 @@ func (userService *userServiceImpl) Edit(userId int, userPayload *dto.UserUpdate
 		return nil, err
 	}
 
-	user, err := userService.userRepo.FetchById(userId)
+	user, err := u.ur.FetchById(userId)
 
 	if err != nil {
 		if err.Status() == http.StatusNotFound {
@@ -120,7 +120,7 @@ func (userService *userServiceImpl) Edit(userId int, userPayload *dto.UserUpdate
 		Username: userPayload.Username,
 	}
 
-	response, err := userService.userRepo.Update(usr)
+	response, err := u.ur.Update(usr)
 
 	if err != nil {
 		return nil, err
@@ -134,9 +134,9 @@ func (userService *userServiceImpl) Edit(userId int, userPayload *dto.UserUpdate
 }
 
 // Remove implements UserService.
-func (userService *userServiceImpl) Remove(userId int) (*dto.GetUserResponse, errs.Error) {
+func (u *userServiceImpl) Remove(userId int) (*dto.GetUserResponse, errs.Error) {
 
-	user, err := userService.userRepo.FetchById(userId)
+	user, err := u.ur.FetchById(userId)
 
 	if err != nil {
 		if err.Status() == http.StatusNotFound {
@@ -149,7 +149,7 @@ func (userService *userServiceImpl) Remove(userId int) (*dto.GetUserResponse, er
 		return nil, errs.NewNotFoundError("invalid user")
 	}
 
-	err = userService.userRepo.Delete(userId)
+	err = u.ur.Delete(userId)
 
 	if err != nil {
 		return nil, err

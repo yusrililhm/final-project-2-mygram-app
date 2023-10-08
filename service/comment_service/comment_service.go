@@ -18,19 +18,19 @@ type CommentService interface {
 }
 
 type commentServiceImpl struct {
-	photoRepo   photo_repository.PhotoRepository
-	commentRepo comment_repository.CommentRepository
+	pr photo_repository.PhotoRepository
+	cr comment_repository.CommentRepository
 }
 
 func NewCommentService(commentRepo comment_repository.CommentRepository, photoRepo photo_repository.PhotoRepository) CommentService {
 	return &commentServiceImpl{
-		photoRepo:   photoRepo,
-		commentRepo: commentRepo,
+		pr: photoRepo,
+		cr: commentRepo,
 	}
 }
 
 // AddComment implements CommentService.
-func (commentService *commentServiceImpl) AddComment(userId int, commentPayload *dto.NewCommentRequest) (*dto.GetCommentResponse, errs.Error) {
+func (c *commentServiceImpl) AddComment(userId int, commentPayload *dto.NewCommentRequest) (*dto.GetCommentResponse, errs.Error) {
 
 	err := helper.ValidateStruct(commentPayload)
 
@@ -38,7 +38,7 @@ func (commentService *commentServiceImpl) AddComment(userId int, commentPayload 
 		return nil, err
 	}
 
-	_, err = commentService.photoRepo.GetPhotoId(commentPayload.PhotoId)
+	_, err = c.pr.GetPhotoId(commentPayload.PhotoId)
 
 	if err != nil {
 		if err.Status() == http.StatusNotFound {
@@ -53,7 +53,7 @@ func (commentService *commentServiceImpl) AddComment(userId int, commentPayload 
 		Message: commentPayload.Message,
 	}
 
-	response, err := commentService.commentRepo.AddComment(comment)
+	response, err := c.cr.AddComment(comment)
 
 	if err != nil {
 		return nil, err
@@ -67,9 +67,9 @@ func (commentService *commentServiceImpl) AddComment(userId int, commentPayload 
 }
 
 // GetComments implements CommentService.
-func (commentService *commentServiceImpl) GetComments() (*dto.GetCommentResponse, errs.Error) {
+func (c *commentServiceImpl) GetComments() (*dto.GetCommentResponse, errs.Error) {
 
-	data, err := commentService.commentRepo.GetComments()
+	data, err := c.cr.GetComments()
 
 	if err != nil {
 		return nil, err
@@ -83,9 +83,9 @@ func (commentService *commentServiceImpl) GetComments() (*dto.GetCommentResponse
 }
 
 // DeleteComment implements CommentService.
-func (commentService *commentServiceImpl) DeleteComment(commentId int) (*dto.GetCommentResponse, errs.Error) {
+func (c *commentServiceImpl) DeleteComment(commentId int) (*dto.GetCommentResponse, errs.Error) {
 
-	err := commentService.commentRepo.DeleteComment(commentId)
+	err := c.cr.DeleteComment(commentId)
 
 	if err != nil {
 		return nil, err
@@ -99,7 +99,7 @@ func (commentService *commentServiceImpl) DeleteComment(commentId int) (*dto.Get
 }
 
 // UpdateComment implements CommentService.
-func (commentService *commentServiceImpl) UpdateComment(commentId int, commentPayload *dto.UpdateCommentRequest) (*dto.GetCommentResponse, errs.Error) {
+func (c *commentServiceImpl) UpdateComment(commentId int, commentPayload *dto.UpdateCommentRequest) (*dto.GetCommentResponse, errs.Error) {
 
 	err := helper.ValidateStruct(commentPayload)
 
@@ -111,7 +111,7 @@ func (commentService *commentServiceImpl) UpdateComment(commentId int, commentPa
 		Message: commentPayload.Message,
 	}
 
-	data, err := commentService.commentRepo.UpdateComment(commentId, comment)
+	data, err := c.cr.UpdateComment(commentId, comment)
 
 	if err != nil {
 		return nil, err
