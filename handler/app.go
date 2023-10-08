@@ -26,15 +26,15 @@ func StartApplication() {
 	userService := user_service.NewUserService(userRepo)
 	userHandler := NewUserHandler(userService)
 
-	photoRepository := photo_pg.NewPhotoRepository(db)
-	photoService := photo_service.NewPhotoService(photoRepository)
+	photoRepo := photo_pg.NewPhotoRepository(db)
+	photoService := photo_service.NewPhotoService(photoRepo)
 	photoHandler := NewPhotoHandler(photoService)
 
 	commentRepo := comment_pg.NewCommentRepository(db)
-	commentService := comment_service.NewCommentService(commentRepo, photoRepository)
+	commentService := comment_service.NewCommentService(commentRepo, photoRepo)
 	commentHandler := NewCommentHandler(commentService)
 
-	authService := auth_service.NewAuthService(userRepo, photoRepository)
+	authService := auth_service.NewAuthService(userRepo, photoRepo, commentRepo)
 
 	app := gin.Default()
 
@@ -64,8 +64,8 @@ func StartApplication() {
 	{
 		comments.POST("", authService.Authentication(), commentHandler.AddComment)
 		comments.GET("", authService.Authentication(), commentHandler.GetComments)
-		comments.PUT("/:commentId", authService.Authentication(), commentHandler.UpdateComment)
-		comments.DELETE("/:commentId", authService.Authentication(), commentHandler.DeleteComment)
+		comments.PUT("/:commentId", authService.Authentication(), authService.AuthorizationComment(), commentHandler.UpdateComment)
+		comments.DELETE("/:commentId", authService.Authentication(), authService.AuthorizationComment(), commentHandler.DeleteComment)
 	}
 
 	app.Run(":" + config.AppConfig().Port)
