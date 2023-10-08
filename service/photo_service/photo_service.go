@@ -97,7 +97,7 @@ func (photoService *photoServiceImpl) UpdatePhoto(photoId int, photoPayload *dto
 
 	return &dto.GetPhotoResponse{
 		StatusCode: http.StatusOK,
-		Message:    "photo successfully updated",
+		Message:    "photo has been successfully updated",
 		Data:       response,
 	}, nil
 }
