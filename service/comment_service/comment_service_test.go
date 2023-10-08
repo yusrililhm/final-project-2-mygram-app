@@ -123,3 +123,35 @@ func TestCommentService_AddComment_Success(t *testing.T) {
 	assert.NotNil(t, response)
 	assert.Equal(t, http.StatusCreated, response.StatusCode)
 }
+
+func TestCommentService_GetComments_ServerError_Fail(t *testing.T) {
+	commentRepo := comment_repository.NewCommentRepositoryMock()
+	photoRepo := photo_repository.NewPhotoRepositoryMock()
+	commentService := comment_service.NewCommentService(commentRepo, photoRepo)
+
+	comment_repository.GetComments = func() ([]comment_repository.CommentUserPhotoMapped, errs.Error) {
+		return nil, errs.NewInternalServerError("something went wrong")
+	}
+
+	response, err := commentService.GetComments()
+
+	assert.Nil(t, response)
+	assert.NotNil(t, err)
+	assert.Equal(t, http.StatusInternalServerError, err.Status())
+}
+
+func TestCommentService_GetComments_Success(t *testing.T) {
+	commentRepo := comment_repository.NewCommentRepositoryMock()
+	photoRepo := photo_repository.NewPhotoRepositoryMock()
+	commentService := comment_service.NewCommentService(commentRepo, photoRepo)
+
+	comment_repository.GetComments = func() ([]comment_repository.CommentUserPhotoMapped, errs.Error) {
+		return []comment_repository.CommentUserPhotoMapped{}, nil
+	}
+
+	response, err := commentService.GetComments()
+
+	assert.Nil(t, err)
+	assert.NotNil(t, response)
+	assert.Equal(t, http.StatusOK, response.StatusCode)
+}
