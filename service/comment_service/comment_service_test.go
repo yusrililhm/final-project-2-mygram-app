@@ -187,3 +187,58 @@ func TestCommentService_DeleteComment_Success(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusOK, response.StatusCode)
 }
+
+func TestCommentService_UpdateComment_InvalidRequest_Fail(t *testing.T) {
+	commentRepo := comment_repository.NewCommentRepositoryMock()
+	photoRepo := photo_repository.NewPhotoRepositoryMock()
+	commentService := comment_service.NewCommentService(commentRepo, photoRepo)
+
+	commentPayload := &dto.UpdateCommentRequest{}
+
+	response, err := commentService.UpdateComment(1, commentPayload)
+
+	assert.Nil(t, response)
+	assert.NotNil(t, err)
+	assert.Equal(t, http.StatusBadRequest, err.Status())
+}
+
+func TestCommentService_UpdateComment_ServerError_Fail(t *testing.T) {
+	commentRepo := comment_repository.NewCommentRepositoryMock()
+	photoRepo := photo_repository.NewPhotoRepositoryMock()
+	commentService := comment_service.NewCommentService(commentRepo, photoRepo)
+
+	commentPayload := &dto.UpdateCommentRequest{
+		Message: "lorem",
+	}
+
+	comment_repository.UpdateComment = func(commentId int, commentPayload *entity.Comment) (*dto.UpdateCommentResponse, errs.Error) {
+		return nil, errs.NewInternalServerError("something went wrong")
+	}
+
+	response, err := commentService.UpdateComment(1, commentPayload)
+
+	assert.Nil(t, response)
+	assert.NotNil(t, err)
+	assert.Equal(t, http.StatusInternalServerError, err.Status())
+}
+
+func TestCommentService_UpdateComment_Success(t *testing.T) {
+	commentRepo := comment_repository.NewCommentRepositoryMock()
+	photoRepo := photo_repository.NewPhotoRepositoryMock()
+	commentService := comment_service.NewCommentService(commentRepo, photoRepo)
+
+	commentPayload := &dto.UpdateCommentRequest{
+		Message: "lorem",
+	}
+
+	comment_repository.UpdateComment = func(commentId int, commentPayload *entity.Comment) (*dto.UpdateCommentResponse, errs.Error) {
+		return &dto.UpdateCommentResponse{}, nil
+	}
+
+	response, err := commentService.UpdateComment(1, commentPayload)
+
+	assert.NotNil(t, response)
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, response.StatusCode)
+}
+
