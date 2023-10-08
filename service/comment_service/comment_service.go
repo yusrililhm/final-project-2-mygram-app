@@ -14,6 +14,7 @@ type CommentService interface {
 	AddComment(userId int, commentPayload *dto.NewCommentRequest) (*dto.GetCommentResponse, errs.Error)
 	GetComments() (*dto.GetCommentResponse, errs.Error)
 	DeleteComment(commentId int) (*dto.GetCommentResponse, errs.Error)
+	UpdateComment(commentId int, commentPayload *dto.UpdateCommentRequest) (*dto.GetCommentResponse, errs.Error)
 }
 
 type commentServiceImpl struct {
@@ -94,5 +95,31 @@ func (commentService *commentServiceImpl) DeleteComment(commentId int) (*dto.Get
 		StatusCode: http.StatusOK,
 		Message:    "Your comment has been successfully deleted",
 		Data:       nil,
+	}, nil
+}
+
+// UpdateComment implements CommentService.
+func (commentService *commentServiceImpl) UpdateComment(commentId int, commentPayload *dto.UpdateCommentRequest) (*dto.GetCommentResponse, errs.Error) {
+
+	err := helper.ValidateStruct(commentPayload)
+
+	if err != nil {
+		return nil, err
+	}
+
+	comment := &entity.Comment{
+		Message: commentPayload.Message,
+	}
+
+	data, err := commentService.commentRepo.UpdateComment(commentId, comment)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &dto.GetCommentResponse{
+		StatusCode: http.StatusOK,
+		Message:    "comment has been successfully updated",
+		Data:       data,
 	}, nil
 }
