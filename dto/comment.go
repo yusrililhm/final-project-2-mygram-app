@@ -26,3 +26,11 @@ type GetCommentResponse struct {
 type UpdateCommentRequest struct {
 	Message string `json:"message" valid:"required~Message can't be empty" example:"so beautifull"`
 }
+
+type UpdateCommentResponse struct {
+	Id        int       `json:"id"`
+	UserId    int       `json:"user_id"`
+	PhotoId   int       `json:"photo_id"`
+	Message   string    `json:"message"`
+	UpdatedAt time.Time `json:"updated_at"`
+}
