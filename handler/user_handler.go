@@ -17,16 +17,16 @@ type UserHandler interface {
 }
 
 type userHandlerImpl struct {
-	userService user_service.UserService
+	us user_service.UserService
 }
 
 func NewUserHandler(userService user_service.UserService) UserHandler {
 	return &userHandlerImpl{
-		userService: userService,
+		us: userService,
 	}
 }
 
-func (userHandler *userHandlerImpl) Register(ctx *gin.Context) {
+func (u *userHandlerImpl) Register(ctx *gin.Context) {
 	userPayload := &dto.NewUserRequest{}
 
 	if err := ctx.ShouldBindJSON(userPayload); err != nil {
@@ -35,7 +35,7 @@ func (userHandler *userHandlerImpl) Register(ctx *gin.Context) {
 		return
 	}
 
-	response, err := userHandler.userService.Add(userPayload)
+	response, err := u.us.Add(userPayload)
 
 	if err != nil {
 		ctx.AbortWithStatusJSON(err.Status(), err)
@@ -46,7 +46,7 @@ func (userHandler *userHandlerImpl) Register(ctx *gin.Context) {
 }
 
 // Login implements UserHandler.
-func (userHandler *userHandlerImpl) Login(ctx *gin.Context) {
+func (u *userHandlerImpl) Login(ctx *gin.Context) {
 	userPayload := &dto.UserLoginRequest{}
 
 	if err := ctx.ShouldBindJSON(userPayload); err != nil {
@@ -55,7 +55,7 @@ func (userHandler *userHandlerImpl) Login(ctx *gin.Context) {
 		return
 	}
 
-	response, err := userHandler.userService.Get(userPayload)
+	response, err := u.us.Get(userPayload)
 
 	if err != nil {
 		ctx.AbortWithStatusJSON(err.Status(), err)
@@ -66,7 +66,7 @@ func (userHandler *userHandlerImpl) Login(ctx *gin.Context) {
 }
 
 // Update implements UserHandler.
-func (userHandler *userHandlerImpl) Update(ctx *gin.Context) {
+func (u *userHandlerImpl) Update(ctx *gin.Context) {
 	user := ctx.MustGet("userData").(entity.User)
 
 	userPayload := &dto.UserUpdateRequest{}
@@ -77,7 +77,7 @@ func (userHandler *userHandlerImpl) Update(ctx *gin.Context) {
 		return
 	}
 
-	response, err := userHandler.userService.Edit(user.Id, userPayload)
+	response, err := u.us.Edit(user.Id, userPayload)
 
 	if err != nil {
 		ctx.AbortWithStatusJSON(err.Status(), err)
@@ -88,11 +88,11 @@ func (userHandler *userHandlerImpl) Update(ctx *gin.Context) {
 }
 
 // Delete implements UserHandler.
-func (userHandler *userHandlerImpl) Delete(ctx *gin.Context) {
+func (u *userHandlerImpl) Delete(ctx *gin.Context) {
 
 	user := ctx.MustGet("userData").(entity.User)
 
-	response, err := userHandler.userService.Remove(user.Id)
+	response, err := u.us.Remove(user.Id)
 
 	if err != nil {
 		ctx.AbortWithStatusJSON(err.Status(), err)

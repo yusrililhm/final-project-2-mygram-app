@@ -18,17 +18,17 @@ type CommentHandler interface {
 }
 
 type commentHandlerImpl struct {
-	commentService comment_service.CommentService
+	cs comment_service.CommentService
 }
 
 func NewCommentHandler(commentService comment_service.CommentService) CommentHandler {
 	return &commentHandlerImpl{
-		commentService: commentService,
+		cs: commentService,
 	}
 }
 
 // AddComment implements CommentHandler.
-func (commentHandler *commentHandlerImpl) AddComment(ctx *gin.Context) {
+func (c *commentHandlerImpl) AddComment(ctx *gin.Context) {
 	user := ctx.MustGet("userData").(entity.User)
 	commentPayload := &dto.NewCommentRequest{}
 
@@ -38,7 +38,7 @@ func (commentHandler *commentHandlerImpl) AddComment(ctx *gin.Context) {
 		return
 	}
 
-	response, err := commentHandler.commentService.AddComment(user.Id, commentPayload)
+	response, err := c.cs.AddComment(user.Id, commentPayload)
 
 	if err != nil {
 		ctx.AbortWithStatusJSON(err.Status(), err)
@@ -49,10 +49,10 @@ func (commentHandler *commentHandlerImpl) AddComment(ctx *gin.Context) {
 }
 
 // DeleteComment implements CommentHandler.
-func (commentHandler *commentHandlerImpl) DeleteComment(ctx *gin.Context) {
+func (c *commentHandlerImpl) DeleteComment(ctx *gin.Context) {
 	commentId, _ := strconv.Atoi(ctx.Param("commentId"))
 
-	response, err := commentHandler.commentService.DeleteComment(commentId)
+	response, err := c.cs.DeleteComment(commentId)
 
 	if err != nil {
 		ctx.AbortWithStatusJSON(err.Status(), err)
@@ -63,8 +63,8 @@ func (commentHandler *commentHandlerImpl) DeleteComment(ctx *gin.Context) {
 }
 
 // GetComments implements CommentHandler.
-func (commentHandler *commentHandlerImpl) GetComments(ctx *gin.Context) {
-	response, err := commentHandler.commentService.GetComments()
+func (c *commentHandlerImpl) GetComments(ctx *gin.Context) {
+	response, err := c.cs.GetComments()
 
 	if err != nil {
 		ctx.AbortWithStatusJSON(err.Status(), err)
@@ -75,7 +75,7 @@ func (commentHandler *commentHandlerImpl) GetComments(ctx *gin.Context) {
 }
 
 // UpdateComment implements CommentHandler.
-func (commentHandler *commentHandlerImpl) UpdateComment(ctx *gin.Context) {
+func (c *commentHandlerImpl) UpdateComment(ctx *gin.Context) {
 	commentId, _ := strconv.Atoi(ctx.Param("commentId"))
 
 	commentPayload := &dto.UpdateCommentRequest{}
@@ -86,7 +86,7 @@ func (commentHandler *commentHandlerImpl) UpdateComment(ctx *gin.Context) {
 		return
 	}
 
-	response, err := commentHandler.commentService.UpdateComment(commentId, commentPayload)
+	response, err := c.cs.UpdateComment(commentId, commentPayload)
 
 	if err != nil {
 		ctx.AbortWithStatusJSON(err.Status(), err)
