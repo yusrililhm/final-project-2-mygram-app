@@ -128,7 +128,7 @@ func (userService *userServiceImpl) Edit(userId int, userPayload *dto.UserUpdate
 
 	return &dto.GetUserResponse{
 		StatusCode: http.StatusOK,
-		Message:    "user updated successfully",
+		Message:    "user has been successfully updated",
 		Data:       response,
 	}, nil
 }
