@@ -5,10 +5,12 @@ import (
 	"myGram/infra/database"
 	"myGram/repository/comment_repository/comment_pg"
 	"myGram/repository/photo_repository/photo_pg"
+	"myGram/repository/social_media_repository/social_media_pg"
 	"myGram/repository/user_repository/user_pg"
 	"myGram/service/auth_service"
 	"myGram/service/comment_service"
 	"myGram/service/photo_service"
+	"myGram/service/social_media_service"
 	"myGram/service/user_service"
 
 	"github.com/gin-gonic/gin"
@@ -34,7 +36,9 @@ func StartApplication() {
 	commentService := comment_service.NewCommentService(commentRepo, photoRepo)
 	commentHandler := NewCommentHandler(commentService)
 
-	socialMediaHandler := NewSocialMediasHandler()
+	socialMediaRepo := social_media_pg.NewSocialMediaRepository(db)
+	socialMediaService := social_media_service.NewSocialMediaService(socialMediaRepo)
+	socialMediaHandler := NewSocialMediasHandler(socialMediaService)
 
 	authService := auth_service.NewAuthService(userRepo, photoRepo, commentRepo)
 
