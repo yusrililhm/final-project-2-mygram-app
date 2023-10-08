@@ -211,7 +211,7 @@ func TestCommentService_UpdateComment_ServerError_Fail(t *testing.T) {
 		Message: "lorem",
 	}
 
-	comment_repository.UpdateComment = func(commentId int, commentPayload *entity.Comment) (*dto.UpdateCommentResponse, errs.Error) {
+	comment_repository.UpdateComment = func(commentId int, commentPayload *entity.Comment) (*dto.PhotoUpdateResponse, errs.Error) {
 		return nil, errs.NewInternalServerError("something went wrong")
 	}
 
@@ -231,8 +231,8 @@ func TestCommentService_UpdateComment_Success(t *testing.T) {
 		Message: "lorem",
 	}
 
-	comment_repository.UpdateComment = func(commentId int, commentPayload *entity.Comment) (*dto.UpdateCommentResponse, errs.Error) {
-		return &dto.UpdateCommentResponse{}, nil
+	comment_repository.UpdateComment = func(commentId int, commentPayload *entity.Comment) (*dto.PhotoUpdateResponse, errs.Error) {
+		return &dto.PhotoUpdateResponse{}, nil
 	}
 
 	response, err := commentService.UpdateComment(1, commentPayload)
