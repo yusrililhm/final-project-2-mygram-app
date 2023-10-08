@@ -12,6 +12,7 @@ import (
 
 type CommentService interface {
 	AddComment(userId int, commentPayload *dto.NewCommentRequest) (*dto.GetCommentResponse, errs.Error)
+	GetComments() (*dto.GetCommentResponse, errs.Error)
 }
 
 type commentServiceImpl struct {
@@ -60,5 +61,21 @@ func (commentService *commentServiceImpl) AddComment(userId int, commentPayload 
 		StatusCode: http.StatusCreated,
 		Message:    "new comment successfully added",
 		Data:       response,
+	}, nil
+}
+
+// GetComments implements CommentService.
+func (commentService *commentServiceImpl) GetComments() (*dto.GetCommentResponse, errs.Error) {
+
+	data, err := commentService.commentRepo.GetComments()
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &dto.GetCommentResponse{
+		StatusCode: http.StatusOK,
+		Message:    "fetch comments successfully",
+		Data:       data,
 	}, nil
 }
