@@ -9,8 +9,9 @@ type commentServiceMock struct {
 }
 
 var (
-	AddComment  func(userId int, commentPayload *dto.NewCommentRequest) (*dto.GetCommentResponse, errs.Error)
-	GetComments func() (*dto.GetCommentResponse, errs.Error)
+	AddComment    func(userId int, commentPayload *dto.NewCommentRequest) (*dto.GetCommentResponse, errs.Error)
+	GetComments   func() (*dto.GetCommentResponse, errs.Error)
+	DeleteComment func(commentId int) (*dto.GetCommentResponse, errs.Error)
 )
 
 func NewCommentServiceMock() CommentService {
@@ -25,4 +26,9 @@ func (csm *commentServiceMock) AddComment(userId int, commentPayload *dto.NewCom
 // GetComments implements CommentService.
 func (csm *commentServiceMock) GetComments() (*dto.GetCommentResponse, errs.Error) {
 	return GetComments()
+}
+
+// DeleteComment implements CommentService.
+func (csm *commentServiceMock) DeleteComment(commentId int) (*dto.GetCommentResponse, errs.Error) {
+	return DeleteComment(commentId)
 }
