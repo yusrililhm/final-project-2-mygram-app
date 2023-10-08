@@ -100,14 +100,18 @@ const (
 
 	updateCommentQuery = `
 		UPDATE 
-			comments
+			comments AS c
 		SET
 			message = $2,
 			updated_at = now()
+		FROM
+				photos AS p
 		WHERE
-			id = $1
+			c.photo_id = p.id
+		AND
+			c.id = $1
 		RETURNING
-			id, user_id, photo_id, message, updated_at
+			p.id, p.title, p.caption, p.photo_url, p.user_id, p.updated_at
 	`
 )
 
@@ -252,7 +256,7 @@ func (commentRepo *commentRepositoryImpl) DeleteComment(commentId int) errs.Erro
 }
 
 // UpdateComment implements comment_repository.CommentRepository.
-func (commentRepo *commentRepositoryImpl) UpdateComment(commentId int, commentPayload *entity.Comment) (*dto.UpdateCommentResponse, errs.Error) {
+func (commentRepo *commentRepositoryImpl) UpdateComment(commentId int, commentPayload *entity.Comment) (*dto.PhotoUpdateResponse, errs.Error) {
 
 	tx, err := commentRepo.db.Begin()
 
@@ -263,13 +267,14 @@ func (commentRepo *commentRepositoryImpl) UpdateComment(commentId int, commentPa
 
 	row := tx.QueryRow(updateCommentQuery, commentId, commentPayload.Message)
 
-	var comment dto.UpdateCommentResponse
+	var photo dto.PhotoUpdateResponse
 	err = row.Scan(
-		&comment.Id,
-		&comment.UserId,
-		&comment.PhotoId,
-		&comment.Message,
-		&comment.UpdatedAt,
+		&photo.Id,
+		&photo.Title,
+		&photo.Caption,
+		&photo.PhotoUrl,
+		&photo.UserId,
+		&photo.UpdatedAt,
 	)
 
 	if err != nil {
@@ -282,5 +287,5 @@ func (commentRepo *commentRepositoryImpl) UpdateComment(commentId int, commentPa
 		return nil, errs.NewInternalServerError("something went wrong " + err.Error())
 	}
 
-	return &comment, nil
+	return &photo, nil
 }
