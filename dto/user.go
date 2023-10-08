@@ -16,26 +16,26 @@ type UserLoginRequest struct {
 
 type UserUpdateRequest struct {
 	Username string `json:"username" valid:"required~Username can't be empty" example:"monday"`
-	Email    string `json:"email" valid:"required~Email can't be empty, email" example:"monday.day@email.com"`
+	Email    string `json:"email" valid:"required~Email can't be empty, email" example:"monday.day@weeekly.com"`
 }
 
 type UserUpdateResponse struct {
-	Id        int       `json:"id"`
-	Username  string    `json:"username"`
-	Email     string    `json:"email"`
-	Age       uint      `json:"age"`
-	UpdatedAt time.Time `json:"updated_at"`
+	Id        int       `json:"id" example:"1"`
+	Username  string    `json:"username" example:"monday"`
+	Email     string    `json:"email" example:"monday.day@weeekly.com"`
+	Age       uint      `json:"age" example:"21"`
+	UpdatedAt time.Time `json:"updated_at" example:"2023-10-09T05:14:35.19324086+07:00"`
 }
 
 type UserResponse struct {
-	Id       int    `json:"id"`
-	Username string `json:"username"`
-	Email    string `json:"email"`
-	Age      uint   `json:"age"`
+	Id       int    `json:"id" example:"1"`
+	Username string `json:"username" example:"monday"`
+	Email    string `json:"email" example:"monday.day@email.com"`
+	Age      uint   `json:"age" example:"21"`
 }
 
 type TokenResponse struct {
-	Token string `json:"token"`
+	Token string `json:"token" example:"random string"`
 }
 
 type GetUserResponse struct {
