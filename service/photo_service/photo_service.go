@@ -50,7 +50,7 @@ func (p *photoServiceImpl) AddPhoto(userId int, photoPayload *dto.NewPhotoReques
 
 	return &dto.GetPhotoResponse{
 		StatusCode: http.StatusCreated,
-		Message:    "Add new photo successfully",
+		Message:    "new photo successfully added",
 		Data:       response,
 	}, nil
 }
