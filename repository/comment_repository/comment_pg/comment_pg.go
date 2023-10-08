@@ -30,6 +30,36 @@ const (
 		RETURNING
 			id, message, photo_id, user_id, created_at
 	`
+
+	getCommentQuery = `
+		SELECT 
+			c.id,
+			c.user_id,
+			c.photo_id,
+			c.message,
+			c.created_at,
+			c.updated_at,
+			u.id,
+			u.username,
+			u.email,
+			p.id,
+			p.caption,
+			p.photo_url,
+			p.user_id
+		FROM 
+			comments AS c
+		LEFT JOIN
+			users AS u
+		ON
+			c.user_id = u.id
+		LEFT JOIN
+			photos AS p
+		ON
+			c.photo_id = p.id
+		ORDER BY 
+			c.id
+		ASC
+	`
 )
 
 func NewCommentRepository(db *sql.DB) comment_repository.CommentRepository {
@@ -72,4 +102,43 @@ func (commentRepo *commentRepositoryImpl) AddComment(commentPayload *entity.Comm
 	}
 
 	return &comment, nil
+}
+
+// GetComments implements comment_repository.CommentRepository.
+func (commentRepo *commentRepositoryImpl) GetComments() ([]comment_repository.CommentUserPhotoMapped, errs.Error) {
+
+	var commentsUserPhoto []comment_repository.CommentUserPhoto
+	rows, err := commentRepo.db.Query(getCommentQuery)
+
+	if err != nil {
+		return nil, errs.NewInternalServerError("something went wrong " + err.Error())
+	}
+
+	for rows.Next() {
+		commentUserPhoto := comment_repository.CommentUserPhoto{}
+		err = rows.Scan(
+			&commentUserPhoto.Comment.Id,
+			&commentUserPhoto.Comment.UserId,
+			&commentUserPhoto.Comment.PhotoId,
+			&commentUserPhoto.Comment.Message,
+			&commentUserPhoto.Comment.CreatedAt,
+			&commentUserPhoto.Comment.UpdatedAt,
+			&commentUserPhoto.User.Id,
+			&commentUserPhoto.User.Username,
+			&commentUserPhoto.User.Email,
+			&commentUserPhoto.Photo.Id,
+			&commentUserPhoto.Photo.Caption,
+			&commentUserPhoto.Photo.PhotoUrl,
+			&commentUserPhoto.Photo.UserId,
+		)
+
+		if err != nil {
+			return nil, errs.NewInternalServerError("something went wrong " + err.Error())
+		}
+
+		commentsUserPhoto = append(commentsUserPhoto, commentUserPhoto)
+	}
+
+	result := comment_repository.CommentUserPhotoMapped{}
+	return result.HandleMappingCommentUserPhoto(commentsUserPhoto), nil
 }
