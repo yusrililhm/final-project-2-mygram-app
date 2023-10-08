@@ -13,6 +13,7 @@ import (
 type CommentService interface {
 	AddComment(userId int, commentPayload *dto.NewCommentRequest) (*dto.GetCommentResponse, errs.Error)
 	GetComments() (*dto.GetCommentResponse, errs.Error)
+	DeleteComment(commentId int) (*dto.GetCommentResponse, errs.Error)
 }
 
 type commentServiceImpl struct {
@@ -75,7 +76,23 @@ func (commentService *commentServiceImpl) GetComments() (*dto.GetCommentResponse
 
 	return &dto.GetCommentResponse{
 		StatusCode: http.StatusOK,
-		Message:    "fetch comments successfully",
+		Message:    "comments successfully fetched",
 		Data:       data,
+	}, nil
+}
+
+// DeleteComment implements CommentService.
+func (commentService *commentServiceImpl) DeleteComment(commentId int) (*dto.GetCommentResponse, errs.Error) {
+
+	err := commentService.commentRepo.DeleteComment(commentId)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &dto.GetCommentResponse{
+		StatusCode: http.StatusOK,
+		Message:    "Your comment has been successfully deleted",
+		Data:       nil,
 	}, nil
 }
