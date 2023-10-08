@@ -36,7 +36,7 @@ type CommentUserPhotoMapped struct {
 	Photo     photo     `json:"photo"`
 }
 
-func (cup *CommentUserPhotoMapped) HandleMappingCommentUserPhoto(commentUserPhoto []CommentUserPhoto) []CommentUserPhotoMapped {
+func (cup *CommentUserPhotoMapped) HandleMappingCommentsUserPhoto(commentUserPhoto []CommentUserPhoto) []CommentUserPhotoMapped {
 	commentsUserPhotoMapped := []CommentUserPhotoMapped{}
 
 	for _, eachCommentUserPhoto := range commentUserPhoto {
@@ -65,4 +65,30 @@ func (cup *CommentUserPhotoMapped) HandleMappingCommentUserPhoto(commentUserPhot
 	}
 
 	return commentsUserPhotoMapped
+}
+
+func (cup *CommentUserPhotoMapped) HandleMappingCommentUserPhoto(commentUserPhoto CommentUserPhoto) *CommentUserPhotoMapped {
+
+	commentUserPhotoMapped := CommentUserPhotoMapped{
+		Id:        commentUserPhoto.Comment.Id,
+		UserId:    commentUserPhoto.Comment.UserId,
+		PhotoId:   commentUserPhoto.Comment.PhotoId,
+		Message:   commentUserPhoto.Comment.Message,
+		CreatedAt: commentUserPhoto.Comment.CreatedAt,
+		UpdatedAt: commentUserPhoto.Comment.UpdatedAt,
+		User: user{
+			Id:       commentUserPhoto.User.Id,
+			Username: commentUserPhoto.User.Username,
+			Email:    commentUserPhoto.User.Email,
+		},
+		Photo: photo{
+			Id:       commentUserPhoto.Photo.Id,
+			Title:    commentUserPhoto.Photo.Title,
+			Caption:  commentUserPhoto.Photo.Caption,
+			PhotoUrl: commentUserPhoto.Photo.PhotoUrl,
+			UserId:   commentUserPhoto.Photo.UserId,
+		},
+	}
+
+	return &commentUserPhotoMapped
 }
