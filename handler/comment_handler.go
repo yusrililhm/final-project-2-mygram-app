@@ -11,6 +11,9 @@ import (
 
 type CommentHandler interface {
 	AddComment(ctx *gin.Context)
+	GetComments(ctx *gin.Context)
+	UpdateComment(ctx *gin.Context)
+	DeleteComment(ctx *gin.Context)
 }
 
 type commentHandlerImpl struct {
@@ -42,4 +45,26 @@ func (commentHandler *commentHandlerImpl) AddComment(ctx *gin.Context) {
 	}
 
 	ctx.JSON(response.StatusCode, response)
+}
+
+// DeleteComment implements CommentHandler.
+func (commentHandler *commentHandlerImpl) DeleteComment(ctx *gin.Context) {
+	panic("unimplemented")
+}
+
+// GetComments implements CommentHandler.
+func (commentHandler *commentHandlerImpl) GetComments(ctx *gin.Context) {
+	response, err := commentHandler.commentService.GetComments()
+
+	if err != nil {
+		ctx.AbortWithStatusJSON(err.Status(), err)
+		return
+	}
+
+	ctx.JSON(response.StatusCode, response)
+}
+
+// UpdateComment implements CommentHandler.
+func (commentHandler *commentHandlerImpl) UpdateComment(ctx *gin.Context) {
+	panic("unimplemented")
 }
