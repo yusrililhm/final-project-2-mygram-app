@@ -3,6 +3,7 @@ package auth_service
 import (
 	"myGram/entity"
 	"myGram/pkg/errs"
+	"myGram/repository/comment_repository"
 	"myGram/repository/photo_repository"
 	"myGram/repository/user_repository"
 	"strconv"
@@ -13,17 +14,20 @@ import (
 type AuthService interface {
 	Authentication() gin.HandlerFunc
 	AuthorizationPhoto() gin.HandlerFunc
+	AuthorizationComment() gin.HandlerFunc
 }
 
 type authServiceImpl struct {
-	userRepository  user_repository.UserRepository
-	photoRepository photo_repository.PhotoRepository
+	userRepository    user_repository.UserRepository
+	photoRepository   photo_repository.PhotoRepository
+	commentRepository comment_repository.CommentRepository
 }
 
-func NewAuthService(userRepo user_repository.UserRepository, photoRepo photo_repository.PhotoRepository) AuthService {
+func NewAuthService(userRepo user_repository.UserRepository, photoRepo photo_repository.PhotoRepository, commentRepo comment_repository.CommentRepository) AuthService {
 	return &authServiceImpl{
-		userRepository:  userRepo,
-		photoRepository: photoRepo,
+		userRepository:    userRepo,
+		photoRepository:   photoRepo,
+		commentRepository: commentRepo,
 	}
 }
 
@@ -70,7 +74,31 @@ func (authService *authServiceImpl) AuthorizationPhoto() gin.HandlerFunc {
 		}
 
 		if photo.UserId != user.Id {
-			errUnathorized := errs.NewUnathorizedError("you are not authorized to modify the movie data")
+			errUnathorized := errs.NewUnathorizedError("you are not authorized to modify the photo")
+			ctx.AbortWithStatusJSON(errUnathorized.Status(), errUnathorized)
+		}
+
+		ctx.Next()
+	}
+}
+
+// AuthorizationComment implements AuthService.
+func (authService *authServiceImpl) AuthorizationComment() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+
+		user := ctx.MustGet("userData").(entity.User)
+
+		commentId, _ := strconv.Atoi(ctx.Param("commentId"))
+
+		comment, err := authService.commentRepository.GetCommentById(commentId)
+
+		if err != nil {
+			ctx.AbortWithStatusJSON(err.Status(), err)
+			return
+		}
+
+		if comment.UserId != user.Id {
+			errUnathorized := errs.NewUnathorizedError("you are not authorized to modify the comment")
 			ctx.AbortWithStatusJSON(errUnathorized.Status(), errUnathorized)
 		}
 
