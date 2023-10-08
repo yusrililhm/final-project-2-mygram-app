@@ -155,3 +155,35 @@ func TestCommentService_GetComments_Success(t *testing.T) {
 	assert.NotNil(t, response)
 	assert.Equal(t, http.StatusOK, response.StatusCode)
 }
+
+func TestCommentService_DeleteComment_ServerError_Fail(t *testing.T) {
+	commentRepo := comment_repository.NewCommentRepositoryMock()
+	photoRepo := photo_repository.NewPhotoRepositoryMock()
+	commentService := comment_service.NewCommentService(commentRepo, photoRepo)
+
+	comment_repository.DeleteComment = func(commentId int) errs.Error {
+		return errs.NewInternalServerError("something went wrong")
+	}
+
+	response, err := commentService.DeleteComment(1)
+
+	assert.Nil(t, response)
+	assert.NotNil(t, err)
+	assert.Equal(t, http.StatusInternalServerError, err.Status())
+}
+
+func TestCommentService_DeleteComment_Success(t *testing.T) {
+	commentRepo := comment_repository.NewCommentRepositoryMock()
+	photoRepo := photo_repository.NewPhotoRepositoryMock()
+	commentService := comment_service.NewCommentService(commentRepo, photoRepo)
+
+	comment_repository.DeleteComment = func(commentId int) errs.Error {
+		return nil
+	}
+
+	response, err := commentService.DeleteComment(1)
+
+	assert.NotNil(t, response)
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, response.StatusCode)
+}
