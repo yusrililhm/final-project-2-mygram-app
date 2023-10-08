@@ -5,7 +5,7 @@ import (
 )
 
 type NewCommentRequest struct {
-	PhotoId int    `json:"photo_id" example:""`
+	PhotoId int    `json:"photo_id" example:"1"`
 	Message string `json:"message" valid:"required~Message can't be empty" example:"so beautifull"`
 }
 
@@ -21,4 +21,8 @@ type GetCommentResponse struct {
 	StatusCode int    `json:"status_code"`
 	Message    string `json:"message"`
 	Data       any    `json:"data"`
+}
+
+type UpdateCommentRequest struct {
+	Message string `json:"message" valid:"required~Message can't be empty" example:"so beautifull"`
 }
