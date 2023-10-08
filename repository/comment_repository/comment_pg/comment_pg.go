@@ -88,6 +88,13 @@ const (
 			c.photo_id = p.id
 		WHERE c.id = $1
 	`
+
+	deleteCommentQuery = `
+		DELETE FROM
+			comments
+		WHERE
+			id = $1
+	`
 )
 
 func NewCommentRepository(db *sql.DB) comment_repository.CommentRepository {
@@ -202,4 +209,28 @@ func (commentRepo *commentRepositoryImpl) GetCommentById(commentId int) (*commen
 
 	result := comment_repository.CommentUserPhotoMapped{}
 	return result.HandleMappingCommentUserPhoto(commentUserPhoto), nil
+}
+
+// DeleteComment implements comment_repository.CommentRepository.
+func (commentRepo *commentRepositoryImpl) DeleteComment(commentId int) errs.Error {
+	tx, err := commentRepo.db.Begin()
+
+	if err != nil {
+		tx.Rollback()
+		return errs.NewInternalServerError("something went wrong " + err.Error())
+	}
+
+	_, err = tx.Exec(deleteCommentQuery, commentId)
+
+	if err != nil {
+		tx.Rollback()
+		return errs.NewInternalServerError("something went wrong " + err.Error())
+	}
+
+	if err := tx.Commit(); err != nil {
+		tx.Rollback()
+		return errs.NewInternalServerError("something went wrong " + err.Error())
+	}
+
+	return nil
 }
