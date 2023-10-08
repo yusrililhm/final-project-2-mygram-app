@@ -76,5 +76,22 @@ func (commentHandler *commentHandlerImpl) GetComments(ctx *gin.Context) {
 
 // UpdateComment implements CommentHandler.
 func (commentHandler *commentHandlerImpl) UpdateComment(ctx *gin.Context) {
-	panic("unimplemented")
+	commentId, _ := strconv.Atoi(ctx.Param("commentId"))
+
+	commentPayload := &dto.UpdateCommentRequest{}
+
+	if err := ctx.ShouldBindJSON(commentPayload); err != nil {
+		errBindJson := errs.NewUnprocessableEntityError("invalid json body request")
+		ctx.AbortWithStatusJSON(errBindJson.Status(), errBindJson)
+		return
+	}
+
+	response, err := commentHandler.commentService.UpdateComment(commentId, commentPayload)
+
+	if err != nil {
+		ctx.AbortWithStatusJSON(err.Status(), err)
+		return
+	}
+
+	ctx.JSON(response.StatusCode, response)
 }
