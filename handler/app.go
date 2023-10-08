@@ -63,9 +63,9 @@ func StartApplication() {
 
 	{
 		comments.POST("", authService.Authentication(), commentHandler.AddComment)
-		comments.GET("", authService.Authentication())
-		comments.PUT("/:commentId", authService.Authentication())
-		comments.DELETE("/:commentId", authService.Authentication())
+		comments.GET("", authService.Authentication(), commentHandler.GetComments)
+		comments.PUT("/:commentId", authService.Authentication(), commentHandler.UpdateComment)
+		comments.DELETE("/:commentId", authService.Authentication(), commentHandler.DeleteComment)
 	}
 
 	app.Run(":" + config.AppConfig().Port)
