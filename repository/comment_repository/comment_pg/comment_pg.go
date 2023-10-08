@@ -43,6 +43,7 @@ const (
 			u.username,
 			u.email,
 			p.id,
+			p.title,
 			p.caption,
 			p.photo_url,
 			p.user_id
@@ -73,6 +74,7 @@ const (
 			u.username,
 			u.email,
 			p.id,
+			p.title,
 			p.caption,
 			p.photo_url,
 			p.user_id
@@ -94,6 +96,18 @@ const (
 			comments
 		WHERE
 			id = $1
+	`
+
+	updateCommentQuery = `
+		UPDATE 
+			comments
+		SET
+			message = $2,
+			updated_at = now()
+		WHERE
+			id = $1
+		RETURNING
+			id, user_id, photo_id, message, updated_at
 	`
 )
 
@@ -162,6 +176,7 @@ func (commentRepo *commentRepositoryImpl) GetComments() ([]comment_repository.Co
 			&commentUserPhoto.User.Username,
 			&commentUserPhoto.User.Email,
 			&commentUserPhoto.Photo.Id,
+			&commentUserPhoto.Photo.Title,
 			&commentUserPhoto.Photo.Caption,
 			&commentUserPhoto.Photo.PhotoUrl,
 			&commentUserPhoto.Photo.UserId,
@@ -195,6 +210,7 @@ func (commentRepo *commentRepositoryImpl) GetCommentById(commentId int) (*commen
 		&commentUserPhoto.User.Username,
 		&commentUserPhoto.User.Email,
 		&commentUserPhoto.Photo.Id,
+		&commentUserPhoto.Photo.Title,
 		&commentUserPhoto.Photo.Caption,
 		&commentUserPhoto.Photo.PhotoUrl,
 		&commentUserPhoto.Photo.UserId,
@@ -233,4 +249,38 @@ func (commentRepo *commentRepositoryImpl) DeleteComment(commentId int) errs.Erro
 	}
 
 	return nil
+}
+
+// UpdateComment implements comment_repository.CommentRepository.
+func (commentRepo *commentRepositoryImpl) UpdateComment(commentId int, commentPayload *entity.Comment) (*dto.UpdateCommentResponse, errs.Error) {
+
+	tx, err := commentRepo.db.Begin()
+
+	if err != nil {
+		tx.Rollback()
+		return nil, errs.NewInternalServerError("something went wrong " + err.Error())
+	}
+
+	row := tx.QueryRow(updateCommentQuery, commentId, commentPayload.Message)
+
+	var comment dto.UpdateCommentResponse
+	err = row.Scan(
+		&comment.Id,
+		&comment.UserId,
+		&comment.PhotoId,
+		&comment.Message,
+		&comment.UpdatedAt,
+	)
+
+	if err != nil {
+		tx.Rollback()
+		return nil, errs.NewInternalServerError("something went wrong " + err.Error())
+	}
+
+	if err := tx.Commit(); err != nil {
+		tx.Rollback()
+		return nil, errs.NewInternalServerError("something went wrong " + err.Error())
+	}
+
+	return &comment, nil
 }

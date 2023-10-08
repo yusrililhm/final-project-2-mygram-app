@@ -11,4 +11,5 @@ type CommentRepository interface {
 	GetComments() ([]CommentUserPhotoMapped, errs.Error)
 	GetCommentById(commentId int) (*CommentUserPhotoMapped, errs.Error)
 	DeleteComment(commentId int) errs.Error
+	UpdateComment(commentId int, commentPayload *entity.Comment) (*dto.UpdateCommentResponse, errs.Error)
 }
