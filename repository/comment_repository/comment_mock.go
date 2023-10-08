@@ -14,7 +14,7 @@ var (
 	GetComments    func() ([]CommentUserPhotoMapped, errs.Error)
 	GetCommentById func(commentId int) (*CommentUserPhotoMapped, errs.Error)
 	DeleteComment  func(commentId int) errs.Error
-	UpdateComment         func(commentId int, commentPayload *entity.Comment) (*dto.UpdateCommentResponse, errs.Error)
+	UpdateComment         func(commentId int, commentPayload *entity.Comment) (*dto.PhotoUpdateResponse, errs.Error)
 )
 
 func NewCommentRepositoryMock() CommentRepository {
@@ -42,6 +42,6 @@ func (crm *commentRepositoryMock) DeleteComment(commentId int) errs.Error {
 }
 
 // Update implements CommentRepository.
-func (crm *commentRepositoryMock) UpdateComment(commentId int, commentPayload *entity.Comment) (*dto.UpdateCommentResponse, errs.Error) {
+func (crm *commentRepositoryMock) UpdateComment(commentId int, commentPayload *entity.Comment) (*dto.PhotoUpdateResponse, errs.Error) {
 	return UpdateComment(commentId, commentPayload)
 }
