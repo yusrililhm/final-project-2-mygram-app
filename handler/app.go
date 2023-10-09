@@ -30,7 +30,7 @@ import (
 // @contact.name GLNG-KS07 - Group 5
 // @contact.url https://github.com/yusrililhm/group-5-final-project-2-mygram-app
 
-// @host localhost:8080
+// @host final-project-2-mygram-app-production.up.railway.app
 // @BasePath /
 
 func StartApplication() {
