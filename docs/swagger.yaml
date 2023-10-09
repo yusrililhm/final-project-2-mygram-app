@@ -170,7 +170,7 @@ definitions:
         example: monday
         type: string
     type: object
-host: localhost:8080
+host: https://final-project-2-mygram-app-production.up.railway.app
 info:
   contact:
     name: GLNG-KS07 - Group 5

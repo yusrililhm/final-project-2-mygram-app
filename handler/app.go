@@ -1,9 +1,9 @@
 package handler
 
 import (
-	"myGram/docs"
 	"myGram/infra/config"
 	"myGram/infra/database"
+	_ "myGram/docs"
 
 	"myGram/repository/comment_repository/comment_pg"
 	"myGram/repository/photo_repository/photo_pg"
@@ -22,8 +22,15 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
+// @title MyGram App
+// @version 1.0
+// @description Final Project 2 Kampus Merdeka
+
 // @contact.name GLNG-KS07 - Group 5
 // @contact.url https://github.com/yusrililhm/group-5-final-project-2-mygram-app
+
+// @host https://final-project-2-mygram-app-production.up.railway.app
+// @BasePath /
 
 func StartApplication() {
 
@@ -54,13 +61,6 @@ func StartApplication() {
 	app := gin.Default()
 
 	// swagger
-	docs.SwaggerInfo.Title = "MyGram App"
-	docs.SwaggerInfo.Version = "1.0"
-	docs.SwaggerInfo.Description = "Final Project 2 Kampus Merdeka"
-
-	docs.SwaggerInfo.Schemes = []string{"https", "http"}
-
-	docs.SwaggerInfo.BasePath = "final-project-2-mygram-app-production.up.railway.app"
 	app.GET("/swagger/*any", ginSwagger.WrapHandler(swaggoFile.Handler))
 
 	// routing
