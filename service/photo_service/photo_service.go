@@ -12,7 +12,7 @@ import (
 type PhotoService interface {
 	AddPhoto(userId int, photoPayload *dto.NewPhotoRequest) (*dto.GetPhotoResponse, errs.Error)
 	GetPhotos() (*dto.GetPhotoResponse, errs.Error)
-	UpdatePhoto(photoId int, photoPayload *dto.NewPhotoRequest) (*dto.GetPhotoResponse, errs.Error)
+	UpdatePhoto(photoId int, photoPayload *dto.PhotoUpdateRequest) (*dto.GetPhotoResponse, errs.Error)
 	DeletePhoto(photoId int) (*dto.GetPhotoResponse, errs.Error)
 }
 
@@ -75,7 +75,7 @@ func (p *photoServiceImpl) GetPhotos() (*dto.GetPhotoResponse, errs.Error) {
 }
 
 // UpdatePhoto implements PhotoService.
-func (p *photoServiceImpl) UpdatePhoto(photoId int, photoPayload *dto.NewPhotoRequest) (*dto.GetPhotoResponse, errs.Error) {
+func (p *photoServiceImpl) UpdatePhoto(photoId int, photoPayload *dto.PhotoUpdateRequest) (*dto.GetPhotoResponse, errs.Error) {
 
 	err := helper.ValidateStruct(photoPayload)
 

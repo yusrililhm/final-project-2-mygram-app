@@ -123,7 +123,7 @@ func TestPhotoService_GetPhotos_Success(t *testing.T) {
 
 func TestPhotoService_UpdatePhoto_InvalidRequest_Fail(t *testing.T) {
 
-	photoPayload := &dto.NewPhotoRequest{}
+	photoPayload := &dto.PhotoUpdateRequest{}
 
 	photoRepo := photo_repository.NewPhotoRepositoryMock()
 	photoService := photo_service.NewPhotoService(photoRepo)
@@ -137,7 +137,7 @@ func TestPhotoService_UpdatePhoto_InvalidRequest_Fail(t *testing.T) {
 
 func TestPhotoService_UpdatePhoto_ServerError_Fail(t *testing.T) {
 
-	photoPayload := &dto.NewPhotoRequest{
+	photoPayload := &dto.PhotoUpdateRequest{
 		Title:    "momon",
 		PhotoUrl: "https://google.com",
 		Caption:  "lorem ipsum",
@@ -159,7 +159,7 @@ func TestPhotoService_UpdatePhoto_ServerError_Fail(t *testing.T) {
 
 func TestPhotoService_UpdatePhoto_Success(t *testing.T) {
 
-	photoPayload := &dto.NewPhotoRequest{
+	photoPayload := &dto.PhotoUpdateRequest{
 		Title:    "momon",
 		PhotoUrl: "https://google.com",
 		Caption:  "lorem ipsum",

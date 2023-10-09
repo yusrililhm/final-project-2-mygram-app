@@ -11,7 +11,7 @@ type photoServiceMock struct {
 var (
 	AddPhoto    func(userId int, photoPayload *dto.NewPhotoRequest) (*dto.GetPhotoResponse, errs.Error)
 	GetPhotos   func() (*dto.GetPhotoResponse, errs.Error)
-	UpdatePhoto func(photoId int, photoPayload *dto.NewPhotoRequest) (*dto.GetPhotoResponse, errs.Error)
+	UpdatePhoto func(photoId int, photoPayload *dto.PhotoUpdateRequest) (*dto.GetPhotoResponse, errs.Error)
 	DeletePhoto func(photoId int) (*dto.GetPhotoResponse, errs.Error)
 )
 
@@ -30,7 +30,7 @@ func (psm *photoServiceMock) GetPhotos() (*dto.GetPhotoResponse, errs.Error) {
 }
 
 // UpdatePhoto implements PhotoService.
-func (psm *photoServiceMock) UpdatePhoto(photoId int, photoPayload *dto.NewPhotoRequest) (*dto.GetPhotoResponse, errs.Error) {
+func (psm *photoServiceMock) UpdatePhoto(photoId int, photoPayload *dto.PhotoUpdateRequest) (*dto.GetPhotoResponse, errs.Error) {
 	return UpdatePhoto(photoId, photoPayload)
 }
 
