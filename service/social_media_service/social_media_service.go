@@ -10,7 +10,7 @@ import (
 )
 
 type SocialMediaService interface {
-	AddSocialMedia(socialMediaPayload *dto.NewSocialMediaRequest) (*dto.GetSocialMediaResponse, errs.Error)
+	AddSocialMedia(userId int, socialMediaPayload *dto.NewSocialMediaRequest) (*dto.GetSocialMediaResponse, errs.Error)
 	GetSocialMedias() (*dto.GetSocialMediaHttpResponse, errs.Error)
 	UpdateSocialMedia(socialMediaId int, socialMediaPayload *dto.UpdateSocialMediaRequest) (*dto.GetSocialMediaResponse, errs.Error)
 	DeleteSocialMedia(socialMediaId int) (*dto.GetSocialMediaResponse, errs.Error)
@@ -27,7 +27,7 @@ func NewSocialMediaService(socialMediaRepo social_media_repository.SocialMediaRe
 }
 
 // AddSocialMedia implements SocialMediaService.
-func (s *socialMediaServiceImpl) AddSocialMedia(socialMediaPayload *dto.NewSocialMediaRequest) (*dto.GetSocialMediaResponse, errs.Error) {
+func (s *socialMediaServiceImpl) AddSocialMedia(userId int, socialMediaPayload *dto.NewSocialMediaRequest) (*dto.GetSocialMediaResponse, errs.Error) {
 
 	err := helper.ValidateStruct(socialMediaPayload)
 
@@ -38,6 +38,7 @@ func (s *socialMediaServiceImpl) AddSocialMedia(socialMediaPayload *dto.NewSocia
 	socialMedia := &entity.SocialMedia{
 		Name:           socialMediaPayload.Name,
 		SocialMediaUrl: socialMediaPayload.SocialMediaUrl,
+		UserId:         userId,
 	}
 
 	data, err := s.sr.AddSocialMedia(socialMedia)

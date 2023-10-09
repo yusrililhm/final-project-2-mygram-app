@@ -18,23 +18,27 @@ const (
 			social_media
 				(
 					name,
-					social_media_url
+					social_media_url,
+					user_id
 				)
 		VALUES
 			(
-				$1, $2
+				$1, $2, $3
 			)
 		RETURNING
 			id, name, social_media_url, user_id, created_at
 	`
 	updateSocialMediaQuery = `
 		UPDATE
-			comment
+			social_media
 		SET
 			name = $2,
-			social_media_url = $3
+			social_media_url = $3,
+			updated_at = now()
 		WHERE
 			id = $1
+		RETURNING
+			id, name, social_media_url, user_id, updated_at
 	`
 	deleteSocialMediaQuery = `
 		DELETE FROM
@@ -110,7 +114,7 @@ func (s *socialMediaRepositoryImpl) AddSocialMedia(socialMediaPayload *entity.So
 		return nil, errs.NewInternalServerError("something went wrong " + err.Error())
 	}
 
-	row := tx.QueryRow(addSocialMediaQuery, socialMediaPayload.Name, socialMediaPayload.SocialMediaUrl)
+	row := tx.QueryRow(addSocialMediaQuery, socialMediaPayload.Name, socialMediaPayload.SocialMediaUrl, socialMediaPayload.UserId)
 
 	var socialMedia dto.NewSocialMediaResponse
 	err = row.Scan(
@@ -167,7 +171,7 @@ func (s *socialMediaRepositoryImpl) UpdateSocialMedia(socialMediaId int, socialM
 		return nil, errs.NewInternalServerError("something went wrong " + err.Error())
 	}
 
-	row := tx.QueryRow(updateSocialMediaQuery, socialMediaPayload.Name, socialMediaPayload.SocialMediaUrl)
+	row := tx.QueryRow(updateSocialMediaQuery, socialMediaId, socialMediaPayload.Name, socialMediaPayload.SocialMediaUrl)
 
 	var socialMedia dto.SocialMediaUpdateResponse
 	err = row.Scan(

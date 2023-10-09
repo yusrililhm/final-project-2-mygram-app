@@ -2,6 +2,7 @@ package handler
 
 import (
 	"myGram/dto"
+	"myGram/entity"
 	"myGram/pkg/errs"
 	"myGram/service/social_media_service"
 	"strconv"
@@ -30,6 +31,7 @@ func NewSocialMediasHandler(socialMediaService social_media_service.SocialMediaS
 func (s *socialMediaHndlerImpl) AddSocialMedia(ctx *gin.Context) {
 
 	socialMediaPayload := &dto.NewSocialMediaRequest{}
+	user := ctx.MustGet("userData").(entity.User)
 
 	if err := ctx.ShouldBindJSON(socialMediaPayload); err != nil {
 		errBindJson := errs.NewUnprocessableEntityError("invalid json body request")
@@ -37,7 +39,7 @@ func (s *socialMediaHndlerImpl) AddSocialMedia(ctx *gin.Context) {
 		return
 	}
 
-	response, err := s.ss.AddSocialMedia(socialMediaPayload)
+	response, err := s.ss.AddSocialMedia(user.Id, socialMediaPayload)
 
 	if err != nil {
 		ctx.AbortWithStatusJSON(err.Status(), err)
