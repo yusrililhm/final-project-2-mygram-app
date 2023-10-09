@@ -11,7 +11,7 @@ import (
 
 type SocialMediaService interface {
 	AddSocialMedia(socialMediaPayload *dto.NewSocialMediaRequest) (*dto.GetSocialMediaResponse, errs.Error)
-	GetSocialMedias() (*dto.GetSocialMediaResponse, errs.Error)
+	GetSocialMedias() (*dto.GetSocialMediaHttpResponse, errs.Error)
 	UpdateSocialMedia(socialMediaId int, socialMediaPayload *dto.UpdateSocialMediaRequest) (*dto.GetSocialMediaResponse, errs.Error)
 	DeleteSocialMedia(socialMediaId int) (*dto.GetSocialMediaResponse, errs.Error)
 }
@@ -70,10 +70,18 @@ func (s *socialMediaServiceImpl) DeleteSocialMedia(socialMediaId int) (*dto.GetS
 }
 
 // GetSocialMedias implements SocialMediaService.
-func (s *socialMediaServiceImpl) GetSocialMedias() (*dto.GetSocialMediaResponse, errs.Error) {
-	return &dto.GetSocialMediaResponse{
-		StatusCode: http.StatusOK,
-		Message:    "social medias successfully fetched",
+func (s *socialMediaServiceImpl) GetSocialMedias() (*dto.GetSocialMediaHttpResponse, errs.Error) {
+
+	socialMedia, err := s.sr.GetSocialMedias()
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &dto.GetSocialMediaHttpResponse{
+		StatusCode:  http.StatusOK,
+		Message:     "social medias successfully fetched",
+		SocialMedia: socialMedia,
 	}, nil
 }
 

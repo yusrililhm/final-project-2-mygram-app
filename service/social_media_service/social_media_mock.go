@@ -11,7 +11,7 @@ type socialMediaMock struct {
 var (
 	AddSocialMedia    func(socialMediaPayload *dto.NewSocialMediaRequest) (*dto.GetSocialMediaResponse, errs.Error)
 	DeleteSocialMedia func(socialMediaId int) (*dto.GetSocialMediaResponse, errs.Error)
-	GetSocialMedias   func() (*dto.GetSocialMediaResponse, errs.Error)
+	GetSocialMedias   func() (*dto.GetSocialMediaHttpResponse, errs.Error)
 	UpdateSocialMedia func(socialMediaId int, socialMediaPayload *dto.UpdateSocialMediaRequest) (*dto.GetSocialMediaResponse, errs.Error)
 )
 
@@ -30,7 +30,7 @@ func (s *socialMediaMock) DeleteSocialMedia(socialMediaId int) (*dto.GetSocialMe
 }
 
 // GetSocialMedias implements SocialMediaService.
-func (s *socialMediaMock) GetSocialMedias() (*dto.GetSocialMediaResponse, errs.Error) {
+func (s *socialMediaMock) GetSocialMedias() (*dto.GetSocialMediaHttpResponse, errs.Error) {
 	return GetSocialMedias()
 }
 
