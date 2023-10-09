@@ -1,0 +1,15 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Final Project 2 Kampus Merdeka",
+        "title": "MyGram App",
+        "contact": {
+            "name": "GLNG-KS07 - Group 5",
+            "url": "https://github.com/yusrililhm/group-5-final-project-2-mygram-app"
+        },
+        "version": "1.0"
+    },
+    "host": "final-project-2-mygram-app-production.up.railway.app",
+    "basePath": "/",
+    "paths": {}
+}

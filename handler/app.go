@@ -3,10 +3,14 @@ package handler
 import (
 	"myGram/infra/config"
 	"myGram/infra/database"
+
+	_ "myGram/docs"
+
 	"myGram/repository/comment_repository/comment_pg"
 	"myGram/repository/photo_repository/photo_pg"
 	"myGram/repository/social_media_repository/social_media_pg"
 	"myGram/repository/user_repository/user_pg"
+
 	"myGram/service/auth_service"
 	"myGram/service/comment_service"
 	"myGram/service/photo_service"
@@ -14,7 +18,20 @@ import (
 	"myGram/service/user_service"
 
 	"github.com/gin-gonic/gin"
+
+	swaggoFile "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
+
+// @title MyGram App
+// @version 1.0
+// @description Final Project 2 Kampus Merdeka
+
+// @contact.name GLNG-KS07 - Group 5
+// @contact.url https://github.com/yusrililhm/group-5-final-project-2-mygram-app
+
+// @host final-project-2-mygram-app-production.up.railway.app
+// @BasePath /
 
 func StartApplication() {
 
@@ -45,6 +62,7 @@ func StartApplication() {
 	app := gin.Default()
 
 	// swagger
+	app.GET("/swagger/*any", ginSwagger.WrapHandler(swaggoFile.Handler))
 
 	// routing
 	users := app.Group("users")
