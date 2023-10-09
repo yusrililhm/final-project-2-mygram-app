@@ -9,7 +9,7 @@
         },
         "version": "1.0"
     },
-    "host": "final-project-2-mygram-app-production.up.railway.app",
+    "host": "localhost:8080",
     "basePath": "/",
     "paths": {}
 }
