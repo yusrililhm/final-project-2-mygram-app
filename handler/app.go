@@ -40,7 +40,7 @@ func StartApplication() {
 	socialMediaService := social_media_service.NewSocialMediaService(socialMediaRepo)
 	socialMediaHandler := NewSocialMediasHandler(socialMediaService)
 
-	authService := auth_service.NewAuthService(userRepo, photoRepo, commentRepo)
+	authService := auth_service.NewAuthService(userRepo, photoRepo, commentRepo, socialMediaRepo)
 
 	app := gin.Default()
 
@@ -79,8 +79,8 @@ func StartApplication() {
 	{
 		socialMedias.POST("", authService.Authentication(), socialMediaHandler.AddSocialMedia)
 		socialMedias.GET("", authService.Authentication(), socialMediaHandler.GetSocialMedias)
-		socialMedias.PUT("/:socialMediaId", authService.Authentication(), socialMediaHandler.UpdateSocialMedia)
-		socialMedias.DELETE("/:socialMediaId", authService.Authentication(), socialMediaHandler.DeleteSocialMedia)
+		socialMedias.PUT("/:socialMediaId", authService.Authentication(), authService.AuthorizationSocialMedi(), socialMediaHandler.UpdateSocialMedia)
+		socialMedias.DELETE("/:socialMediaId", authService.Authentication(), authService.AuthorizationSocialMedi(), socialMediaHandler.DeleteSocialMedia)
 	}
 
 	app.Run(":" + config.AppConfig().Port)

@@ -5,6 +5,7 @@ import (
 	"myGram/pkg/errs"
 	"myGram/repository/comment_repository"
 	"myGram/repository/photo_repository"
+	"myGram/repository/social_media_repository"
 	"myGram/repository/user_repository"
 	"strconv"
 
@@ -15,19 +16,22 @@ type AuthService interface {
 	Authentication() gin.HandlerFunc
 	AuthorizationPhoto() gin.HandlerFunc
 	AuthorizationComment() gin.HandlerFunc
+	AuthorizationSocialMedi() gin.HandlerFunc
 }
 
 type authServiceImpl struct {
 	ur user_repository.UserRepository
 	pr photo_repository.PhotoRepository
 	cr comment_repository.CommentRepository
+	sr social_media_repository.SocialMediaRepository
 }
 
-func NewAuthService(userRepo user_repository.UserRepository, photoRepo photo_repository.PhotoRepository, commentRepo comment_repository.CommentRepository) AuthService {
+func NewAuthService(userRepo user_repository.UserRepository, photoRepo photo_repository.PhotoRepository, commentRepo comment_repository.CommentRepository, socialMediaRepo social_media_repository.SocialMediaRepository) AuthService {
 	return &authServiceImpl{
 		ur: userRepo,
 		pr: photoRepo,
 		cr: commentRepo,
+		sr: socialMediaRepo,
 	}
 }
 
@@ -98,6 +102,30 @@ func (a *authServiceImpl) AuthorizationComment() gin.HandlerFunc {
 		}
 
 		if comment.UserId != user.Id {
+			errUnathorized := errs.NewUnathorizedError("you are not authorized to modify the comment")
+			ctx.AbortWithStatusJSON(errUnathorized.Status(), errUnathorized)
+		}
+
+		ctx.Next()
+	}
+}
+
+// AuthorizationSocialMedi implements AuthService.
+func (a *authServiceImpl) AuthorizationSocialMedi() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+
+		user := ctx.MustGet("userData").(entity.User)
+
+		socialMediaId, _ := strconv.Atoi(ctx.Param("socialMediaId"))
+
+		socialMedia, err := a.sr.GetSocialMediaById(socialMediaId)
+
+		if err != nil {
+			ctx.AbortWithStatusJSON(err.Status(), err)
+			return
+		}
+
+		if socialMedia.UserId != user.Id {
 			errUnathorized := errs.NewUnathorizedError("you are not authorized to modify the comment")
 			ctx.AbortWithStatusJSON(errUnathorized.Status(), errUnathorized)
 		}
