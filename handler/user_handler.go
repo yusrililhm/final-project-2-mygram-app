@@ -25,7 +25,16 @@ func NewUserHandler(userService user_service.UserService) UserHandler {
 		us: userService,
 	}
 }
-
+// Register implements UserHandler
+// Register godoc
+// @Summary User register
+// @Description User register
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param dto.NewUserRequest body dto.NewUserRequest true "body request for user register"
+// @Success 201 {object} dto.GetUserResponse
+// @Router /users/register [post]
 func (u *userHandlerImpl) Register(ctx *gin.Context) {
 	userPayload := &dto.NewUserRequest{}
 
@@ -46,6 +55,15 @@ func (u *userHandlerImpl) Register(ctx *gin.Context) {
 }
 
 // Login implements UserHandler.
+// Login godoc
+// @Summary User login
+// @Description User login
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param dto.UserLoginRequest body dto.UserLoginRequest true "body request for user login"
+// @Success 200 {object} dto.GetUserResponse
+// @Router /users/login [post]
 func (u *userHandlerImpl) Login(ctx *gin.Context) {
 	userPayload := &dto.UserLoginRequest{}
 
@@ -66,6 +84,16 @@ func (u *userHandlerImpl) Login(ctx *gin.Context) {
 }
 
 // Update implements UserHandler.
+// Update godoc
+// @Summary User update
+// @Description User update
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer Token"
+// @Param dto.UserUpdateRequest body dto.UserUpdateRequest true "body request for user update"
+// @Success 200 {object} dto.GetUserResponse
+// @Router /users [put]
 func (u *userHandlerImpl) Update(ctx *gin.Context) {
 	user := ctx.MustGet("userData").(entity.User)
 
@@ -88,6 +116,15 @@ func (u *userHandlerImpl) Update(ctx *gin.Context) {
 }
 
 // Delete implements UserHandler.
+// Delete godoc
+// @Summary Create new User
+// @Description Create new Users
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer Token"
+// @Success 200 {object} dto.GetUserResponse
+// @Router /users [delete]
 func (u *userHandlerImpl) Delete(ctx *gin.Context) {
 
 	user := ctx.MustGet("userData").(entity.User)

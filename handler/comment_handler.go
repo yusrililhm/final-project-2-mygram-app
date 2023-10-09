@@ -28,6 +28,16 @@ func NewCommentHandler(commentService comment_service.CommentService) CommentHan
 }
 
 // AddComment implements CommentHandler.
+// AddComment godoc
+// @Summary Add new comment
+// @Description Add new comment
+// @Tags Comments
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer Token"
+// @Param dto.NewCommentRequest body dto.NewCommentRequest true "body request for add new comment"
+// @Success 201 {object} dto.GetCommentResponse
+// @Router /comments [post]
 func (c *commentHandlerImpl) AddComment(ctx *gin.Context) {
 	user := ctx.MustGet("userData").(entity.User)
 	commentPayload := &dto.NewCommentRequest{}
@@ -49,6 +59,16 @@ func (c *commentHandlerImpl) AddComment(ctx *gin.Context) {
 }
 
 // DeleteComment implements CommentHandler.
+// DeleteComment godoc
+// @Summary Delete comment
+// @Description Delete comment
+// @Tags Comments
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer Token"
+// @Param commentId path int true "commentId"
+// @Success 200 {object} dto.GetCommentResponse
+// @Router /comments/{commentId} [delete]
 func (c *commentHandlerImpl) DeleteComment(ctx *gin.Context) {
 	commentId, _ := strconv.Atoi(ctx.Param("commentId"))
 
@@ -63,6 +83,15 @@ func (c *commentHandlerImpl) DeleteComment(ctx *gin.Context) {
 }
 
 // GetComments implements CommentHandler.
+// GetComments godoc
+// @Summary Get comments
+// @Description Get comments
+// @Tags Comments
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer Token"
+// @Success 200 {object} dto.GetCommentResponse
+// @Router /comments [get]
 func (c *commentHandlerImpl) GetComments(ctx *gin.Context) {
 	response, err := c.cs.GetComments()
 
@@ -75,6 +104,17 @@ func (c *commentHandlerImpl) GetComments(ctx *gin.Context) {
 }
 
 // UpdateComment implements CommentHandler.
+// UpdateComment godoc
+// @Summary Update comment
+// @Description Update comment
+// @Tags Comments
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer Token"
+// @Param commentId path int true "commentId"
+// @Param dto.UpdateCommentRequest body dto.UpdateCommentRequest true "body request for update comment"
+// @Success 200 {object} dto.GetCommentResponse
+// @Router /comments/{commentId} [put]
 func (c *commentHandlerImpl) UpdateComment(ctx *gin.Context) {
 	commentId, _ := strconv.Atoi(ctx.Param("commentId"))
 

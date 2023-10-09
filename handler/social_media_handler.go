@@ -28,6 +28,16 @@ func NewSocialMediasHandler(socialMediaService social_media_service.SocialMediaS
 }
 
 // AddSocialMedia implements SocialMediasHandler.
+// AddSocialMedia godoc
+// @Summary Add new social media
+// @Description Add new social media
+// @Tags Social Media
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer Token"
+// @Param dto.NewSocialMediaRequest body dto.NewSocialMediaRequest true "body request for add new social media"
+// @Success 201 {object} dto.GetSocialMediaResponse
+// @Router /socialmedias [post]
 func (s *socialMediaHndlerImpl) AddSocialMedia(ctx *gin.Context) {
 
 	socialMediaPayload := &dto.NewSocialMediaRequest{}
@@ -50,6 +60,16 @@ func (s *socialMediaHndlerImpl) AddSocialMedia(ctx *gin.Context) {
 }
 
 // DeleteSocialMedia implements SocialMediasHandler.
+// DeleteSocialMedia godoc
+// @Summary Delete social media
+// @Description Delete social media
+// @Tags Social Media
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer Token"
+// @Param socialMediaId path int true "socialMediaId"
+// @Success 200 {object} dto.GetSocialMediaResponse
+// @Router /socialmedias/{socialMediaId} [delete]
 func (s *socialMediaHndlerImpl) DeleteSocialMedia(ctx *gin.Context) {
 	socialMediaId, _ := strconv.Atoi(ctx.Param("socialMediaId"))
 
@@ -64,6 +84,15 @@ func (s *socialMediaHndlerImpl) DeleteSocialMedia(ctx *gin.Context) {
 }
 
 // GetSocialMedias implements SocialMediasHandler.
+// GetSocialMedias godoc
+// @Summary Get social medias
+// @Description Get social medias
+// @Tags Social Media
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer Token"
+// @Success 200 {object} dto.GetSocialMediaHttpResponse
+// @Router /socialmedias [get]
 func (s *socialMediaHndlerImpl) GetSocialMedias(ctx *gin.Context) {
 	response, err := s.ss.GetSocialMedias()
 
@@ -76,6 +105,17 @@ func (s *socialMediaHndlerImpl) GetSocialMedias(ctx *gin.Context) {
 }
 
 // UpdateSocialMedia implements SocialMediasHandler.
+// UpdateSocialMedia godoc
+// @Summary Update social media
+// @Description Update social media
+// @Tags Social Media
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer Token"
+// @Param socialMediaId path int true "socialMediaId"
+// @Param dto.UpdateSocialMediaRequest body dto.UpdateSocialMediaRequest true "body request for update social media"
+// @Success 200 {object} dto.GetSocialMediaResponse
+// @Router /socialmedias/{socialMediaId} [put]
 func (s *socialMediaHndlerImpl) UpdateSocialMedia(ctx *gin.Context) {
 
 	socialMediaPayload := &dto.UpdateSocialMediaRequest{}

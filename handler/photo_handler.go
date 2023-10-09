@@ -28,6 +28,16 @@ func NewPhotoHandler(photoService photo_service.PhotoService) PhotoHandler {
 }
 
 // AddPhoto implements PhotoHandler.
+// AddPhoto godoc
+// @Summary Add new photo
+// @Description Add new photo
+// @Tags Photos
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer Token"
+// @Param dto.NewPhotoRequest body dto.NewPhotoRequest true "body request for add new photo"
+// @Success 201 {object} dto.GetPhotoResponse
+// @Router /photos [post]
 func (p *photoHandlerImpl) AddPhoto(ctx *gin.Context) {
 	user := ctx.MustGet("userData").(entity.User)
 	photoPayload := &dto.NewPhotoRequest{}
@@ -49,6 +59,16 @@ func (p *photoHandlerImpl) AddPhoto(ctx *gin.Context) {
 }
 
 // DeletePhoto implements PhotoHandler.
+// DeletePhoto godoc
+// @Summary Delete photo
+// @Description Delete photo
+// @Tags Photos
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer Token"
+// @Param photoId path int true "photoId"
+// @Success 200 {object} dto.GetPhotoResponse
+// @Router /photos/{photoId} [delete]
 func (p *photoHandlerImpl) DeletePhoto(ctx *gin.Context) {
 	photoId, _ := strconv.Atoi(ctx.Param("photoId"))
 
@@ -63,6 +83,15 @@ func (p *photoHandlerImpl) DeletePhoto(ctx *gin.Context) {
 }
 
 // GetPhotos implements PhotoHandler.
+// GetPhotos godoc
+// @Summary Get photos
+// @Description Get photos
+// @Tags Photos
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer Token"
+// @Success 200 {object} dto.GetPhotoResponse
+// @Router /photos [get]
 func (p *photoHandlerImpl) GetPhotos(ctx *gin.Context) {
 	response, err := p.ps.GetPhotos()
 
@@ -75,10 +104,21 @@ func (p *photoHandlerImpl) GetPhotos(ctx *gin.Context) {
 }
 
 // UpdatePhoto implements PhotoHandler.
+// UpdatePhoto godoc
+// @Summary Update photo
+// @Description Update photo
+// @Tags Photos
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer Token"
+// @Param photoId path int true "photoId"
+// @Param dto.PhotoUpdateRequest body dto.PhotoUpdateRequest true "body request for update photo"
+// @Success 200 {object} dto.GetPhotoResponse
+// @Router /photos/{photoId} [put]
 func (p *photoHandlerImpl) UpdatePhoto(ctx *gin.Context) {
 	photoId, _ := strconv.Atoi(ctx.Param("photoId"))
 
-	photoPayload := &dto.NewPhotoRequest{}
+	photoPayload := &dto.PhotoUpdateRequest{}
 
 	if err := ctx.ShouldBindJSON(photoPayload); err != nil {
 		errBindJson := errs.NewUnprocessableEntityError("invalid json body request")
