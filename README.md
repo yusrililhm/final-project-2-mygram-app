@@ -39,14 +39,14 @@ This is the Final Project 2 of Kampus Merdeka in collaboration with Hacktiv8. Fo
 | Photos       | GET      | /photos/                     | Authentication                 | Get Photos           |
 | Photos       | PUT      | /photos/:photoId             | Authentication & Authorization | Update Photos        |
 | Photos       | DELETE   | /photos/:photoId             | Authentication & Authorization | Delete Photo         |
-| Comment      | POST     | /comment/                    | Authentication                 | Add Comment          |
-| Comment      | GET      | /comment/                    | Authentication                 | Get Comments         |
-| Comment      | PUT      | /comment/:commentId          | Authentication & Authorization | Update Comment       |
-| Comment      | DELETE   | /comment/:commentId          | Authentication & Authorization | Delete Comment       |
-| Social Media | POST     | /socialmedis/                | Authentication                 | Add Social Media     |
-| Social Media | GET      | /socialmedis/                | Authentication                 | Get Social Medias    |
-| Social Media | PUT      | /socialmedis/:socialMediaId  | Authentication & Authorization | Update Social Media  |
-| Social Media | DELETE   | /socialmedis/:socialMediaId  | Authentication & Authorization | Delete Social Media  |
+| Comment      | POST     | /comments/                    | Authentication                 | Add Comment          |
+| Comment      | GET      | /comments/                    | Authentication                 | Get Comments         |
+| Comment      | PUT      | /comments/:commentId          | Authentication & Authorization | Update Comment       |
+| Comment      | DELETE   | /comments/:commentId          | Authentication & Authorization | Delete Comment       |
+| Social Media | POST     | /socialmedias/                | Authentication                 | Add Social Media     |
+| Social Media | GET      | /socialmedias/                | Authentication                 | Get Social Medias    |
+| Social Media | PUT      | /socialmedias/:socialMediaId  | Authentication & Authorization | Update Social Media  |
+| Social Media | DELETE   | /socialmedias/:socialMediaId  | Authentication & Authorization | Delete Social Media  |
 
 # Swagger UI
 
