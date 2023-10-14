@@ -72,6 +72,10 @@ func StartApplication() {
 			http.MethodDelete,
 			http.MethodOptions,
 		},
+		AllowHeaders: []string{
+			"Content-Type",
+			"Authorization",
+		},
 	}))
 
 	// swagger
