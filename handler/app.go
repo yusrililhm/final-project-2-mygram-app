@@ -1,9 +1,10 @@
 package handler
 
 import (
+	_ "myGram/docs"
 	"myGram/infra/config"
 	"myGram/infra/database"
-	_ "myGram/docs"
+	"net/http"
 
 	"myGram/repository/comment_repository/comment_pg"
 	"myGram/repository/photo_repository/photo_pg"
@@ -16,6 +17,7 @@ import (
 	"myGram/service/social_media_service"
 	"myGram/service/user_service"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 
 	swaggoFile "github.com/swaggo/files"
@@ -59,6 +61,18 @@ func StartApplication() {
 	authService := auth_service.NewAuthService(userRepo, photoRepo, commentRepo, socialMediaRepo)
 
 	app := gin.Default()
+
+	// cors
+	app.Use(cors.New(cors.Config{
+		AllowOrigins: []string{"*"},
+		AllowMethods: []string{
+			http.MethodPost,
+			http.MethodGet,
+			http.MethodPut,
+			http.MethodDelete,
+			http.MethodOptions,
+		},
+	}))
 
 	// swagger
 	app.GET("/swagger/*any", ginSwagger.WrapHandler(swaggoFile.Handler))
