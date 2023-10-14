@@ -86,7 +86,7 @@ func (userRepo *userRepositoryImpl) Create(userPayload *entity.User) (*dto.UserR
 
 	if err != nil {
 		tx.Rollback()
-		return nil, errs.NewInternalServerError("something went wrong")
+		return nil, errs.NewInternalServerError("something went wrong: " + err.Error())
 	}
 
 	var user dto.UserResponse
@@ -105,12 +105,12 @@ func (userRepo *userRepositoryImpl) Create(userPayload *entity.User) (*dto.UserR
 
 	if err != nil {
 		tx.Rollback()
-		return nil, errs.NewInternalServerError("something went wrong")
+		return nil, errs.NewInternalServerError("something went wrong: " + err.Error())
 	}
 
 	if err := tx.Commit(); err != nil {
 		tx.Rollback()
-		return nil, errs.NewInternalServerError("something went wrong")
+		return nil, errs.NewInternalServerError("something went wrong: " + err.Error())
 	}
 
 	return &user, nil
@@ -134,7 +134,7 @@ func (userRepo *userRepositoryImpl) Fetch(email string) (*entity.User, errs.Erro
 		if err == sql.ErrNoRows {
 			return nil, errs.NewNotFoundError("user not found")
 		}
-		return nil, errs.NewInternalServerError("something went wrong")
+		return nil, errs.NewInternalServerError("something went wrong: " + err.Error())
 	}
 
 	return &user, nil
@@ -192,7 +192,7 @@ func (userRepo *userRepositoryImpl) FetchById(userId int) (*entity.User, errs.Er
 		if err == sql.ErrNoRows {
 			return nil, errs.NewNotFoundError("user not found")
 		}
-		return nil, errs.NewInternalServerError("something went wrong")
+		return nil, errs.NewInternalServerError("something went wrong: " + err.Error())
 	}
 
 	return &user, nil
@@ -204,17 +204,17 @@ func (userRepo *userRepositoryImpl) Delete(userId int) errs.Error {
 
 	if err != nil {
 		tx.Rollback()
-		return errs.NewInternalServerError("something went wrong")
+		return errs.NewInternalServerError("something went wrong: " + err.Error())
 	}
 
 	_, err = tx.Exec(deleteUserQuery, userId)
 
 	if err != nil {
-		return errs.NewInternalServerError("something went wrong")
+		return errs.NewInternalServerError("something went wrong: " + err.Error())
 	}
 
 	if err := tx.Commit(); err != nil {
-		return errs.NewInternalServerError("something went wrong")
+		return errs.NewInternalServerError("something went wrong: " + err.Error())
 	}
 
 	return nil

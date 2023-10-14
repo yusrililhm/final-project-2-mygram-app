@@ -111,7 +111,7 @@ func (s *socialMediaRepositoryImpl) AddSocialMedia(socialMediaPayload *entity.So
 
 	if err != nil {
 		tx.Rollback()
-		return nil, errs.NewInternalServerError("something went wrong " + err.Error())
+		return nil, errs.NewInternalServerError("something went wrong: " + err.Error())
 	}
 
 	row := tx.QueryRow(addSocialMediaQuery, socialMediaPayload.Name, socialMediaPayload.SocialMediaUrl, socialMediaPayload.UserId)
@@ -127,12 +127,12 @@ func (s *socialMediaRepositoryImpl) AddSocialMedia(socialMediaPayload *entity.So
 
 	if err != nil {
 		tx.Rollback()
-		return nil, errs.NewInternalServerError("something went wrong " + err.Error())
+		return nil, errs.NewInternalServerError("something went wrong: " + err.Error())
 	}
 
 	if err := tx.Commit(); err != nil {
 		tx.Rollback()
-		return nil, errs.NewInternalServerError("something went wrong " + err.Error())
+		return nil, errs.NewInternalServerError("something went wrong: " + err.Error())
 	}
 
 	return &socialMedia, nil
@@ -144,19 +144,19 @@ func (s *socialMediaRepositoryImpl) DeleteSocialMedia(socialMediaId int) errs.Er
 
 	if err != nil {
 		tx.Rollback()
-		return errs.NewInternalServerError("something went wrong " + err.Error())
+		return errs.NewInternalServerError("something went wrong: " + err.Error())
 	}
 
 	_, err = tx.Exec(deleteSocialMediaQuery, socialMediaId)
 
 	if err != nil {
 		tx.Rollback()
-		return errs.NewInternalServerError("something went wrong " + err.Error())
+		return errs.NewInternalServerError("something went wrong: " + err.Error())
 	}
 
 	if err := tx.Commit(); err != nil {
 		tx.Rollback()
-		return errs.NewInternalServerError("something went wrong " + err.Error())
+		return errs.NewInternalServerError("something went wrong: " + err.Error())
 	}
 
 	return nil
@@ -168,7 +168,7 @@ func (s *socialMediaRepositoryImpl) UpdateSocialMedia(socialMediaId int, socialM
 
 	if err != nil {
 		tx.Rollback()
-		return nil, errs.NewInternalServerError("something went wrong " + err.Error())
+		return nil, errs.NewInternalServerError("something went wrong: " + err.Error())
 	}
 
 	row := tx.QueryRow(updateSocialMediaQuery, socialMediaId, socialMediaPayload.Name, socialMediaPayload.SocialMediaUrl)
@@ -184,12 +184,12 @@ func (s *socialMediaRepositoryImpl) UpdateSocialMedia(socialMediaId int, socialM
 
 	if err != nil {
 		tx.Rollback()
-		return nil, errs.NewInternalServerError("something went wrong " + err.Error())
+		return nil, errs.NewInternalServerError("something went wrong: " + err.Error())
 	}
 
 	if err := tx.Commit(); err != nil {
 		tx.Rollback()
-		return nil, errs.NewInternalServerError("something went wrong " + err.Error())
+		return nil, errs.NewInternalServerError("something went wrong: " + err.Error())
 	}
 
 	return &socialMedia, nil
@@ -216,7 +216,7 @@ func (s *socialMediaRepositoryImpl) GetSocialMediaById(socialMediaId int) (*dto.
 		if err == sql.ErrNoRows {
 			return nil, errs.NewNotFoundError("social media not found")
 		}
-		return nil, errs.NewInternalServerError("something went wrong")
+		return nil, errs.NewInternalServerError("something went wrong: " + err.Error())
 	}
 
 	result := social_media_repository.SocialMediaUserPhotoMapped{}
@@ -229,7 +229,7 @@ func (s *socialMediaRepositoryImpl) GetSocialMedias() ([]*dto.GetSocialMedia, er
 	rows, err := s.db.Query(getSocialMediaQuery)
 
 	if err != nil {
-		return nil, errs.NewInternalServerError("something went wrong")
+		return nil, errs.NewInternalServerError("something went wrong: " + err.Error())
 	}
 
 	var socialMedias []social_media_repository.SocialMediaUserPhoto
@@ -249,7 +249,7 @@ func (s *socialMediaRepositoryImpl) GetSocialMedias() ([]*dto.GetSocialMedia, er
 		)
 
 		if err != nil {
-			return nil, errs.NewInternalServerError("something went wrong")
+			return nil, errs.NewInternalServerError("something went wrong: " + err.Error())
 		}
 
 		socialMedias = append(socialMedias, socialMedia)

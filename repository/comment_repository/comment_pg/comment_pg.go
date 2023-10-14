@@ -127,7 +127,7 @@ func (commentRepo *commentRepositoryImpl) AddComment(commentPayload *entity.Comm
 
 	if err != nil {
 		tx.Rollback()
-		return nil, errs.NewInternalServerError("something went wrong " + err.Error())
+		return nil, errs.NewInternalServerError("something went wrong: " + err.Error())
 	}
 
 	var comment dto.NewCommentResponse
@@ -146,12 +146,12 @@ func (commentRepo *commentRepositoryImpl) AddComment(commentPayload *entity.Comm
 
 	if err != nil {
 		tx.Rollback()
-		return nil, errs.NewInternalServerError("something went wrong " + err.Error())
+		return nil, errs.NewInternalServerError("something went wrong: " + err.Error())
 	}
 
 	if err := tx.Commit(); err != nil {
 		tx.Rollback()
-		return nil, errs.NewInternalServerError("something went wrong " + err.Error())
+		return nil, errs.NewInternalServerError("something went wrong: " + err.Error())
 	}
 
 	return &comment, nil
@@ -164,7 +164,7 @@ func (commentRepo *commentRepositoryImpl) GetComments() ([]comment_repository.Co
 	rows, err := commentRepo.db.Query(getCommentQuery)
 
 	if err != nil {
-		return nil, errs.NewInternalServerError("something went wrong " + err.Error())
+		return nil, errs.NewInternalServerError("something went wrong: " + err.Error())
 	}
 
 	for rows.Next() {
@@ -187,7 +187,7 @@ func (commentRepo *commentRepositoryImpl) GetComments() ([]comment_repository.Co
 		)
 
 		if err != nil {
-			return nil, errs.NewInternalServerError("something went wrong " + err.Error())
+			return nil, errs.NewInternalServerError("something went wrong: " + err.Error())
 		}
 
 		commentsUserPhoto = append(commentsUserPhoto, commentUserPhoto)
@@ -224,7 +224,7 @@ func (commentRepo *commentRepositoryImpl) GetCommentById(commentId int) (*commen
 		if err == sql.ErrNoRows {
 			return nil, errs.NewNotFoundError("comment not found")
 		}
-		return nil, errs.NewInternalServerError("something went wrong " + err.Error())
+		return nil, errs.NewInternalServerError("something went wrong: " + err.Error())
 	}
 
 	result := comment_repository.CommentUserPhotoMapped{}
@@ -237,19 +237,19 @@ func (commentRepo *commentRepositoryImpl) DeleteComment(commentId int) errs.Erro
 
 	if err != nil {
 		tx.Rollback()
-		return errs.NewInternalServerError("something went wrong " + err.Error())
+		return errs.NewInternalServerError("something went wrong: " + err.Error())
 	}
 
 	_, err = tx.Exec(deleteCommentQuery, commentId)
 
 	if err != nil {
 		tx.Rollback()
-		return errs.NewInternalServerError("something went wrong " + err.Error())
+		return errs.NewInternalServerError("something went wrong: " + err.Error())
 	}
 
 	if err := tx.Commit(); err != nil {
 		tx.Rollback()
-		return errs.NewInternalServerError("something went wrong " + err.Error())
+		return errs.NewInternalServerError("something went wrong: " + err.Error())
 	}
 
 	return nil
@@ -262,7 +262,7 @@ func (commentRepo *commentRepositoryImpl) UpdateComment(commentId int, commentPa
 
 	if err != nil {
 		tx.Rollback()
-		return nil, errs.NewInternalServerError("something went wrong " + err.Error())
+		return nil, errs.NewInternalServerError("something went wrong: " + err.Error())
 	}
 
 	row := tx.QueryRow(updateCommentQuery, commentId, commentPayload.Message)
@@ -279,12 +279,12 @@ func (commentRepo *commentRepositoryImpl) UpdateComment(commentId int, commentPa
 
 	if err != nil {
 		tx.Rollback()
-		return nil, errs.NewInternalServerError("something went wrong " + err.Error())
+		return nil, errs.NewInternalServerError("something went wrong: " + err.Error())
 	}
 
 	if err := tx.Commit(); err != nil {
 		tx.Rollback()
-		return nil, errs.NewInternalServerError("something went wrong " + err.Error())
+		return nil, errs.NewInternalServerError("something went wrong: " + err.Error())
 	}
 
 	return &photo, nil
