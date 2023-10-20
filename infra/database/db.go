@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"myGram/infra/config"
+	"time"
 
 	_ "github.com/lib/pq"
 )
@@ -35,6 +36,11 @@ func handleDatabaseConnection() {
 		log.Panicln("error occured while trying to connect to database :", err.Error())
 		return
 	}
+
+	db.SetMaxOpenConns(100)
+	db.SetConnMaxLifetime(60 * time.Minute)
+	db.SetMaxIdleConns(10)
+	db.SetConnMaxIdleTime(10 * time.Minute)
 }
 
 func handleRequiredTables() {
