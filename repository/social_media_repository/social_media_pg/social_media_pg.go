@@ -67,7 +67,7 @@ const (
 		LEFT JOIN
 			photos AS p
 		ON
-			p.id = s.user_id
+			p.user_id = s.user_id
 		ORDER BY
 			s.id
 		ASC
