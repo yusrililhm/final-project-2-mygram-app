@@ -57,7 +57,7 @@ const (
 			s.updated_at,
 			u.id,
 			u.username,
-			p.photo_url
+			MIN(p.photo_url) AS photo_url
 		FROM
 			social_media AS s
 		LEFT JOIN
@@ -68,6 +68,8 @@ const (
 			photos AS p
 		ON
 			p.user_id = s.user_id
+		GROUP BY 
+			s.id, s.name, s.social_media_url, s.user_id, s.created_at, s.updated_at, u.id, u.username
 		ORDER BY
 			s.id
 		ASC
