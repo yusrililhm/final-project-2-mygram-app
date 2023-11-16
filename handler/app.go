@@ -114,8 +114,8 @@ func StartApplication() {
 	{
 		socialMedias.POST("", authService.Authentication(), socialMediaHandler.AddSocialMedia)
 		socialMedias.GET("", authService.Authentication(), socialMediaHandler.GetSocialMedias)
-		socialMedias.PUT("/:socialMediaId", authService.Authentication(), authService.AuthorizationSocialMedi(), socialMediaHandler.UpdateSocialMedia)
-		socialMedias.DELETE("/:socialMediaId", authService.Authentication(), authService.AuthorizationSocialMedi(), socialMediaHandler.DeleteSocialMedia)
+		socialMedias.PUT("/:socialMediaId", authService.Authentication(), authService.AuthorizationSocialMedia(), socialMediaHandler.UpdateSocialMedia)
+		socialMedias.DELETE("/:socialMediaId", authService.Authentication(), authService.AuthorizationSocialMedia(), socialMediaHandler.DeleteSocialMedia)
 	}
 
 	app.Run(":" + config.AppConfig().Port)
