@@ -7,6 +7,7 @@ import (
 	"myGram/repository/photo_repository"
 	"myGram/repository/social_media_repository"
 	"myGram/repository/user_repository"
+	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -16,7 +17,7 @@ type AuthService interface {
 	Authentication() gin.HandlerFunc
 	AuthorizationPhoto() gin.HandlerFunc
 	AuthorizationComment() gin.HandlerFunc
-	AuthorizationSocialMedi() gin.HandlerFunc
+	AuthorizationSocialMedia() gin.HandlerFunc
 }
 
 type authServiceImpl struct {
@@ -73,6 +74,11 @@ func (a *authServiceImpl) AuthorizationPhoto() gin.HandlerFunc {
 		photo, err := a.pr.GetPhotoId(photoId)
 
 		if err != nil {
+			if err.Status() == http.StatusNotFound {
+				errBadRequest := errs.NewBadRequestError("photo not found")
+				ctx.AbortWithStatusJSON(errBadRequest.Status(), errBadRequest)
+				return
+			}
 			ctx.AbortWithStatusJSON(err.Status(), err)
 			return
 		}
@@ -97,6 +103,11 @@ func (a *authServiceImpl) AuthorizationComment() gin.HandlerFunc {
 		comment, err := a.cr.GetCommentById(commentId)
 
 		if err != nil {
+			if err.Status() == http.StatusNotFound {
+				errBadRequest := errs.NewBadRequestError("comment not found")
+				ctx.AbortWithStatusJSON(errBadRequest.Status(), errBadRequest)
+				return
+			}
 			ctx.AbortWithStatusJSON(err.Status(), err)
 			return
 		}
@@ -110,8 +121,8 @@ func (a *authServiceImpl) AuthorizationComment() gin.HandlerFunc {
 	}
 }
 
-// AuthorizationSocialMedi implements AuthService.
-func (a *authServiceImpl) AuthorizationSocialMedi() gin.HandlerFunc {
+// AuthorizationSocialMedia implements AuthService.
+func (a *authServiceImpl) AuthorizationSocialMedia() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
 		user := ctx.MustGet("userData").(entity.User)
@@ -121,6 +132,11 @@ func (a *authServiceImpl) AuthorizationSocialMedi() gin.HandlerFunc {
 		socialMedia, err := a.sr.GetSocialMediaById(socialMediaId)
 
 		if err != nil {
+			if err.Status() == http.StatusNotFound {
+				errBadRequest := errs.NewBadRequestError("social media not found")
+				ctx.AbortWithStatusJSON(errBadRequest.Status(), errBadRequest)
+				return
+			}
 			ctx.AbortWithStatusJSON(err.Status(), err)
 			return
 		}
