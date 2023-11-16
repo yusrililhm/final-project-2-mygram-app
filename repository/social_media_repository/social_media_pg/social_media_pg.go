@@ -201,17 +201,17 @@ func (s *socialMediaRepositoryImpl) UpdateSocialMedia(socialMediaId int, socialM
 func (s *socialMediaRepositoryImpl) GetSocialMediaById(socialMediaId int) (*dto.GetSocialMedia, errs.Error) {
 	row := s.db.QueryRow(getSocialMediaByIdQuery, socialMediaId)
 
-	var socialMedia social_media_repository.SocialMediaUserPhoto
+	var socialMedia socialMediaWithUserAndPhoto
 	err := row.Scan(
-		&socialMedia.SocialMedia.Id,
-		&socialMedia.SocialMedia.Name,
-		&socialMedia.SocialMedia.SocialMediaUrl,
-		&socialMedia.SocialMedia.UserId,
-		&socialMedia.SocialMedia.CreatedAt,
-		&socialMedia.SocialMedia.UpdatedAt,
-		&socialMedia.User.Id,
-		&socialMedia.User.Username,
-		&socialMedia.Photo.PhotoUrl,
+		&socialMedia.SocialMediaId,
+		&socialMedia.SocialMediaName,
+		&socialMedia.SocialMediaSocialMediaUrl,
+		&socialMedia.SocialMediaUserId,
+		&socialMedia.SocialMediaCreatedAt,
+		&socialMedia.SocialMediaUpdatedAt,
+		&socialMedia.UserId,
+		&socialMedia.UserUsername,
+		&socialMedia.PhotoPhotoUrl,
 	)
 
 	if err != nil {
@@ -222,7 +222,7 @@ func (s *socialMediaRepositoryImpl) GetSocialMediaById(socialMediaId int) (*dto.
 	}
 
 	result := social_media_repository.SocialMediaUserPhotoMapped{}
-	return result.HandleMappingSocialMediaWithUserAndPhotoById(socialMedia), nil
+	return result.HandleMappingSocialMediaWithUserAndPhotoById(social_media_repository.SocialMediaUserPhoto(socialMedia.socialMediaWithUserAndPhotoToAggregate())), nil
 }
 
 // GetSocialMedias implements social_media_repository.SocialMediaRepository.
@@ -237,24 +237,24 @@ func (s *socialMediaRepositoryImpl) GetSocialMedias() ([]*dto.GetSocialMedia, er
 	var socialMedias []social_media_repository.SocialMediaUserPhoto
 
 	for rows.Next() {
-		var socialMedia social_media_repository.SocialMediaUserPhoto
+		var socialMedia socialMediaWithUserAndPhoto
 		err = rows.Scan(
-			&socialMedia.SocialMedia.Id,
-			&socialMedia.SocialMedia.Name,
-			&socialMedia.SocialMedia.SocialMediaUrl,
-			&socialMedia.SocialMedia.UserId,
-			&socialMedia.SocialMedia.CreatedAt,
-			&socialMedia.SocialMedia.UpdatedAt,
-			&socialMedia.User.Id,
-			&socialMedia.User.Username,
-			&socialMedia.Photo.PhotoUrl,
+			&socialMedia.SocialMediaId,
+			&socialMedia.SocialMediaName,
+			&socialMedia.SocialMediaSocialMediaUrl,
+			&socialMedia.SocialMediaUserId,
+			&socialMedia.SocialMediaCreatedAt,
+			&socialMedia.SocialMediaUpdatedAt,
+			&socialMedia.UserId,
+			&socialMedia.UserUsername,
+			&socialMedia.PhotoPhotoUrl,
 		)
 
 		if err != nil {
 			return nil, errs.NewInternalServerError("something went wrong: " + err.Error())
 		}
 
-		socialMedias = append(socialMedias, socialMedia)
+		socialMedias = append(socialMedias, social_media_repository.SocialMediaUserPhoto(socialMedia.socialMediaWithUserAndPhotoToAggregate()))
 	}
 
 	result := social_media_repository.SocialMediaUserPhotoMapped{}
