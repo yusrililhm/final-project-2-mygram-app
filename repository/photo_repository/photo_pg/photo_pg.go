@@ -108,7 +108,7 @@ func (photoRepo *photoRepositoryImpl) AddPhoto(photoPayload *entity.Photo) (*dto
 
 	if err != nil {
 		tx.Rollback()
-		return nil, errs.NewInternalServerError("something went wrong: " + err.Error())
+		return nil, errs.NewInternalServerError("something went wrong")
 	}
 
 	row := tx.QueryRow(addNewPhotoQuery, photoPayload.UserId, photoPayload.Title, photoPayload.Caption, photoPayload.PhotoUrl)
@@ -125,12 +125,12 @@ func (photoRepo *photoRepositoryImpl) AddPhoto(photoPayload *entity.Photo) (*dto
 
 	if err != nil {
 		tx.Rollback()
-		return nil, errs.NewInternalServerError("something went wrong: " + err.Error())
+		return nil, errs.NewInternalServerError("something went wrong")
 	}
 
 	if err := tx.Commit(); err != nil {
 		tx.Rollback()
-		return nil, errs.NewInternalServerError("something went wrong: " + err.Error())
+		return nil, errs.NewInternalServerError("something went wrong")
 	}
 
 	return &photo, nil
@@ -143,7 +143,7 @@ func (photoRepo *photoRepositoryImpl) GetPhotos() ([]photo_repository.PhotoUserM
 	rows, err := photoRepo.db.Query(getUserAndPhotos)
 
 	if err != nil {
-		return nil, errs.NewInternalServerError("something went wrong: " + err.Error())
+		return nil, errs.NewInternalServerError("something went wrong")
 	}
 
 	for rows.Next() {
@@ -163,9 +163,9 @@ func (photoRepo *photoRepositoryImpl) GetPhotos() ([]photo_repository.PhotoUserM
 
 		if err != nil {
 			if err == sql.ErrNoRows {
-				return nil, errs.NewNotFoundError("photos not found: " + err.Error())
+				return nil, errs.NewNotFoundError("photos not found")
 			}
-			return nil, errs.NewInternalServerError("something went wrong: " + err.Error())
+			return nil, errs.NewInternalServerError("something went wrong")
 		}
 
 		photosUser = append(photosUser, photoUser)
@@ -197,7 +197,7 @@ func (photoRepo *photoRepositoryImpl) GetPhotoId(photoId int) (*photo_repository
 		if err == sql.ErrNoRows {
 			return nil, errs.NewNotFoundError("photo not found")
 		}
-		return nil, errs.NewInternalServerError("something went wrong: " + err.Error())
+		return nil, errs.NewInternalServerError("something went wrong")
 	}
 
 	result := photo_repository.PhotoUserMapped{}
@@ -210,7 +210,7 @@ func (photoRepo *photoRepositoryImpl) UpdatePhoto(photoId int, photoPayload *ent
 
 	if err != nil {
 		tx.Rollback()
-		return nil, errs.NewInternalServerError("something went wrong: " + err.Error())
+		return nil, errs.NewInternalServerError("something went wrong")
 	}
 
 	row := tx.QueryRow(UpdatePhotoQuery, photoId, photoPayload.Title, photoPayload.Caption, photoPayload.PhotoUrl)
@@ -228,12 +228,12 @@ func (photoRepo *photoRepositoryImpl) UpdatePhoto(photoId int, photoPayload *ent
 
 	if err != nil {
 		tx.Rollback()
-		return nil, errs.NewInternalServerError("something went wrong: " + err.Error())
+		return nil, errs.NewInternalServerError("something went wrong")
 	}
 
 	if err := tx.Commit(); err != nil {
 		tx.Rollback()
-		return nil, errs.NewInternalServerError("something went wrong: " + err.Error())
+		return nil, errs.NewInternalServerError("something went wrong")
 	}
 
 	return &photo, nil
@@ -245,19 +245,19 @@ func (photoRepo *photoRepositoryImpl) DeletePhoto(photoId int) errs.Error {
 
 	if err != nil {
 		tx.Rollback()
-		return errs.NewInternalServerError("something went wrong: " + err.Error())
+		return errs.NewInternalServerError("something went wrong")
 	}
 
 	_, err = tx.Exec(deletePhotoById, photoId)
 
 	if err != nil {
 		tx.Rollback()
-		return errs.NewInternalServerError("something went wrong: " + err.Error())
+		return errs.NewInternalServerError("something went wrong")
 	}
 
 	if err := tx.Commit(); err != nil {
 		tx.Rollback()
-		return errs.NewInternalServerError("something went wrong: " + err.Error())
+		return errs.NewInternalServerError("something went wrong")
 	}
 
 	return nil

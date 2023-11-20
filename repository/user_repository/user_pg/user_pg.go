@@ -86,7 +86,7 @@ func (userRepo *userRepositoryImpl) Create(userPayload *entity.User) (*dto.UserR
 
 	if err != nil {
 		tx.Rollback()
-		return nil, errs.NewInternalServerError("something went wrong: " + err.Error())
+		return nil, errs.NewInternalServerError("something went wrong")
 	}
 
 	var user dto.UserResponse
@@ -105,12 +105,12 @@ func (userRepo *userRepositoryImpl) Create(userPayload *entity.User) (*dto.UserR
 
 	if err != nil {
 		tx.Rollback()
-		return nil, errs.NewInternalServerError("something went wrong: " + err.Error())
+		return nil, errs.NewInternalServerError("something went wrong")
 	}
 
 	if err := tx.Commit(); err != nil {
 		tx.Rollback()
-		return nil, errs.NewInternalServerError("something went wrong: " + err.Error())
+		return nil, errs.NewInternalServerError("something went wrong")
 	}
 
 	return &user, nil
@@ -134,7 +134,7 @@ func (userRepo *userRepositoryImpl) Fetch(email string) (*entity.User, errs.Erro
 		if err == sql.ErrNoRows {
 			return nil, errs.NewNotFoundError("user not found")
 		}
-		return nil, errs.NewInternalServerError("something went wrong: " + err.Error())
+		return nil, errs.NewInternalServerError("something went wrong")
 	}
 
 	return &user, nil
@@ -147,7 +147,7 @@ func (userRepo *userRepositoryImpl) Update(userPayload *entity.User) (*dto.UserU
 
 	if err != nil {
 		tx.Rollback()
-		return nil, errs.NewInternalServerError("something went wrong " + err.Error())
+		return nil, errs.NewInternalServerError("something went wron")
 	}
 
 	row := tx.QueryRow(updateUserQuery, userPayload.Id, userPayload.Username, userPayload.Email)
@@ -163,12 +163,12 @@ func (userRepo *userRepositoryImpl) Update(userPayload *entity.User) (*dto.UserU
 
 	if err != nil {
 		tx.Rollback()
-		return nil, errs.NewInternalServerError("something went wrong" + err.Error())
+		return nil, errs.NewInternalServerError("something went wro")
 	}
 
 	if err := tx.Commit(); err != nil {
 		tx.Rollback()
-		return nil, errs.NewInternalServerError("something went wrong" + err.Error())
+		return nil, errs.NewInternalServerError("something went wro")
 	}
 
 	return &user, nil
@@ -192,7 +192,7 @@ func (userRepo *userRepositoryImpl) FetchById(userId int) (*entity.User, errs.Er
 		if err == sql.ErrNoRows {
 			return nil, errs.NewNotFoundError("user not found")
 		}
-		return nil, errs.NewInternalServerError("something went wrong: " + err.Error())
+		return nil, errs.NewInternalServerError("something went wrong")
 	}
 
 	return &user, nil
@@ -204,17 +204,17 @@ func (userRepo *userRepositoryImpl) Delete(userId int) errs.Error {
 
 	if err != nil {
 		tx.Rollback()
-		return errs.NewInternalServerError("something went wrong: " + err.Error())
+		return errs.NewInternalServerError("something went wrong")
 	}
 
 	_, err = tx.Exec(deleteUserQuery, userId)
 
 	if err != nil {
-		return errs.NewInternalServerError("something went wrong: " + err.Error())
+		return errs.NewInternalServerError("something went wrong")
 	}
 
 	if err := tx.Commit(); err != nil {
-		return errs.NewInternalServerError("something went wrong: " + err.Error())
+		return errs.NewInternalServerError("something went wrong")
 	}
 
 	return nil
