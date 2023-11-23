@@ -132,9 +132,9 @@ func (userRepo *userRepositoryImpl) Fetch(email string) (*entity.User, errs.Erro
 
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, errs.NewNotFoundError("user not found")
+			return &user, errs.NewNotFoundError("user not found")
 		}
-		return nil, errs.NewInternalServerError("something went wrong")
+		return &user, errs.NewInternalServerError("something went wrong")
 	}
 
 	return &user, nil

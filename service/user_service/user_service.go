@@ -44,6 +44,12 @@ func (u *userServiceImpl) Add(userPayload *dto.NewUserRequest) (*dto.GetUserResp
 
 	user.HashPassword()
 
+	usr, _ := u.ur.Fetch(userPayload.Email)
+
+	if usr.Email == userPayload.Email {
+		
+	}
+
 	response, err := u.ur.Create(user)
 
 	if err != nil {

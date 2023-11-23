@@ -76,3 +76,11 @@ func NewInternalServerError(message string) Error {
 		ErrErrors:  "INTERNAL_SERVER_ERROR",
 	}
 }
+
+func NewConflictError(message string) Error {
+	return &ErrorData{
+		ErrStatus:  http.StatusConflict,
+		ErrMessage: message,
+		ErrErrors:  "CONFLICT_ERROR",
+	}
+}
