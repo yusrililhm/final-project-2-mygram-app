@@ -47,7 +47,7 @@ func (u *userServiceImpl) Add(userPayload *dto.NewUserRequest) (*dto.GetUserResp
 	usr, _ := u.ur.Fetch(userPayload.Email)
 
 	if usr.Email == userPayload.Email {
-		
+		return nil, errs.NewConflictError("email has been used")
 	}
 
 	response, err := u.ur.Create(user)
